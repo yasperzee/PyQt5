@@ -56,22 +56,22 @@ SHEET_NAME   = "CompareData"
 #SHEET_NAME   = "SleepTest"
 #SHEET_NAME   = "SensorData"
 
-# Sheet named 'SHEET_NAME' must exist on Spreadsheet
-value_range1 = SHEET_NAME + '!A'+ str(MIN_ROW)
-value_range2 = SHEET_NAME + '!F'+ str(MIN_ROW)
-value_range4 = SHEET_NAME + '!K'+ str(MIN_ROW)
-#value_range5 = SHEET_NAME + '!R'+ str(MIN_ROW)
-#value_range6 = SHEET_NAME + '!Y'+ str(MIN_ROW)
-
-# Range on sheet to write node info & topic(location)
+# Range on sheet to write value, node info & topic(location)
+value_range1         = '!A'+ str(MIN_ROW)
 node_info_range1     = '!A2'
 node_topic_range1    = '!A3'
+
+value_range2         = '!F'+ str(MIN_ROW)
 node_info_range2     = '!F2'
 node_topic_range2    = '!F3'
-node_info_range4     = '!K2'
-node_topic_range4    = '!K3'
-#node_info_range5     = '!P2'
-#node_topic_range5    = '!P3'
+
+value_range3         = '!K'+ str(MIN_ROW)
+node_info_range3     = '!K2'
+node_topic_range3    = '!K3'
+
+value_range4         = '!R'+ str(MIN_ROW)
+node_info_range4     = '!R2'
+node_topic_range4    = '!R3'
 
 
 subscription = ("Koti/Olohuone/Lampotila",  # NODE-01 / DHT11
@@ -82,13 +82,20 @@ subscription = ("Koti/Olohuone/Lampotila",  # NODE-01 / DHT11
                 "Koti/Ulkoilma/Ilmankosteus",
                 "Koti/Ulkoilma/NodeInfo",
                 "Koti/Ulkoilma/TopicInfo",
-                "Koti/Partsi/Lampotila",# NODE-04 / BMP180 & TEMT6000
+                "Koti/Partsi/Lampotila",# NODE-03 / BMP180 & TEMT6000
                 "Koti/Partsi/Ilmanpaine",
                 "Koti/Partsi/Korkeus",
                 "Koti/Partsi/Valoisuus",
                 "Koti/Partsi/Vcc",
                 "Koti/Partsi/NodeInfo",
-                "Koti/Partsi/TopicInfo"
+                "Koti/Partsi/TopicInfo",
+                "Koti/Parveke/Lampotila",# NODE-04 / BMP280
+                "Koti/Parveke/Ilmanpaine",
+                "Koti/Parveke/Korkeus",
+                #"Koti/Parveke/Valoisuus",
+                #"Koti/Parveke/Vcc",
+                "Koti/Parveke/NodeInfo",
+                "Koti/Parveke/TopicInfo"
                 )
 
 # Select mqtt server connect to

@@ -61,8 +61,8 @@ def on_connect(client, userdata, flags, rc):
     # Subscribing in on_connect() means that if we lose the connection and
     # reconnect then subscriptions will be renewed.
 
-    for subst in subscription:
-        client.subscribe(subst)
+    for subsc in subscription:
+        client.subscribe(subsc)
 
 #*******************************************************************************
 #*******************************************************************************
@@ -86,7 +86,7 @@ def on_message(client, userdata, msg):
 
     sensor = "Lampotila"
     if topic.endswith(sensor):
-        updateSheet.setTemp(ERROR_VALUE)
+        updateSheet.setTemp("N/A")
         #print(sensor)
         payload = (str(msg.payload))
         tmp = (payload.split(': '))
@@ -94,12 +94,11 @@ def on_message(client, userdata, msg):
         tmp = (tmp.strip('}\''))
         temp = tmp.replace(".", ",")
         updateSheet.setTemp(temp)
-        #testing = updateSheet.getTemp()
-        #print("Temperature is: " + str(testing))
+        #print("Temperature is:" + updateSheet.getTemp())
 
     sensor = "Ilmanpaine"
     if topic.endswith(sensor):
-        updateSheet.setBaro(ERROR_VALUE)
+        updateSheet.setBaro("N/A")
         #print(sensor)
         payload = (str(msg.payload))
         tmp = (payload.split(': '))
@@ -108,11 +107,11 @@ def on_message(client, userdata, msg):
         baro = tmp.replace(".", ",")
         updateSheet.setBaro(baro)
         #testing = updateSheet.getBaro()
-        #print("Barometer is: " + str(testing))
+        #print("Barometer is:" + str(testing))
 
     sensor = "Korkeus";
     if topic.endswith(sensor):
-        updateSheet.setAlti(ERROR_VALUE)
+        updateSheet.setAlti("N/A")
         #print(sensor)
         payload = (str(msg.payload))
         tmp = (payload.split(': '))
@@ -125,7 +124,7 @@ def on_message(client, userdata, msg):
 
     sensor = "Ilmankosteus";
     if topic.endswith(sensor):
-        updateSheet.setHumid(ERROR_VALUE)
+        updateSheet.setHumid("N/A")
         #print(sensor)
         payload = (str(msg.payload))
         tmp = (payload.split(':'))
@@ -134,11 +133,11 @@ def on_message(client, userdata, msg):
         humid = tmp.replace(".", ",")
         updateSheet.setHumid(humid)
         #testing = updateSheet.getHumid()
-        #print("Humidity is: " + str(testing))
+        #print("Humidity is:" + str(testing))
 
     sensor = "Valoisuus";
     if topic.endswith(sensor):
-        updateSheet.setALS(ERROR_VALUE)
+        updateSheet.setALS("N/A")
         #print(sensor)
         payload = (str(msg.payload))
         tmp = (payload.split(':'))
@@ -147,20 +146,20 @@ def on_message(client, userdata, msg):
         als = tmp.replace(".", ",")
         updateSheet.setALS(als)
         #testing = updateSheet.getALS()
-        #print("AmbientLight  is: " + str(testing))
+        #print("AmbientLight  is:" + str(testing))
 
     sensor = "Vcc";
     if topic.endswith(sensor):
-        updateSheet.setVccBatt(ERROR_VALUE)
+        updateSheet.setVccBatt("N/A")
         #print(sensor)
         payload = (str(msg.payload))
         tmp = (payload.split(':'))
         tmp = tmp.pop(1)
         tmp = (tmp.strip('}\''))
         vcc = tmp.replace(".", ",")
-        updateSheet.setVccBatt(vcc)
-        #testing = updateSheet.getVccBatt()
-        #print("Vcc  is: " + str(testing))
+        updateSheet.setVcc(vcc)
+        #testing = updateSheet.getVcc()
+        #print("Vcc  is:" + str(testing))
 
     sensor = "NodeInfo"
     if topic.endswith(sensor):
@@ -173,11 +172,12 @@ def on_message(client, userdata, msg):
         nodemcu = tmp.pop(0)
         updateSheet.setNodeMcu(nodemcu)
         #testing = updateSheet.getNodeMcu()
-        #print("Nodemcu is:      " + testing)
+        #print("Nodemcu is:" + testing)
+        print("Nodemcu is:" + updateSheet.getNodeMcu())
         sens = tmp.pop(0)
         updateSheet.setSensor(sens)
         #testing = updateSheet.getSensor()
-        #print("Sensor is:      " + testing)
+        #print("Sensor is:" + testing)
         node = tmp.pop(0)
         updateSheet.setNodeID(node)
         print("")
@@ -186,22 +186,18 @@ def on_message(client, userdata, msg):
         failcount = tmp.pop(0)
         updateSheet.setFailCount(failcount)
         #testing = updateSheet.getFailCount()
-        #print("FailCount is:   " + testing)
-        vcc = tmp.pop(0)
-        updateSheet.setVccBatt(vcc)
-        #testing = updateSheet.getVccBatt()
-        #print("Vcc is:   " + testing)
+        #print("FailCount is:" + testing)
 
     sensor = "TopicInfo"
     if topic.endswith(sensor):
         #print(sensor)
         payload = (str(msg.payload))
-        tmp = (payload.split(':'))
+        tmp = (payload.split(': '))
         tmp = tmp.pop(1)
         location = tmp.strip('}\'')
         updateSheet.setLocation(str(location))
         #testing = updateSheet.getLocation()
-        #print("Location is:     " + testing)
+        #print("Location is:" + testing)
 
 #*******************************************************************************
 #*******************************************************************************
