@@ -6,7 +6,8 @@
 #
 #   Sensors:    BMP-180 / BMP-280 (temperature, pressure)
 #               BME-280 (temperature, pressure, humidity)
-#
+#               DTH-11 / DTH22 (temperature,humidity)
+
 #   paho-mqtt:
 #   To obtain the full code, including examples and tests,
 #   you can clone the git repository:
@@ -14,11 +15,11 @@
 #*******************************************************************************
 #TODO:  Add failsafe incase server not available
 #TODO:  Get rid of globals
-#TODO:  add __DEBUG__ flag
 #TODO:  Clean up 'on_message' method ->  move sensor handling somewhere
-# ToDo: support for AmbientLightSensor
+
 """-------- Version history ----------------------------------------------------
-    v1.2    yasperzee   5'19    Remove DHT11 and DHT22 support
+    v1.3    yasperzee   5'19    Cleaning for Release
+    v1.2    yasperzee   5'19    ALS support (TEMT6000)
     v1.1    yasperzee   5'19    vcc_batt
     v1.0    yasperzee   4'19    Prints fixed
     v0.9    yasperzee   4'19    Subscribtion definitions moved to configuration.py
@@ -49,21 +50,19 @@ class DataToSheet(WriteNodeDataToSheet):
     pass
 
 # GLOBALS
-#unsubscribe = False
 semaf       = False
 updateSheet = DataToSheet()
 
 #*******************************************************************************
-#*******************************************************************************
 # The callback for when the client receives a CONNACK response from the mqtt-server.
 def on_connect(client, userdata, flags, rc):
-    print("Connected with result code "+str(rc))
+    print("mqtt server connected.")
+    #print("mqtt_server connected with result code "+str(rc))
 
     # Subscribing in on_connect() means that if we lose the connection and
     # reconnect then subscriptions will be renewed.
-
-    for subst in subscription:
-        client.subscribe(subst)
+    for subsc in subscription:
+        client.subscribe(subsc)
 
 #*******************************************************************************
 #*******************************************************************************
@@ -81,16 +80,14 @@ def on_message(client, userdata, msg):
 
     semaf = True
     topic = (str(msg.topic))
-    #print("")
-    #print("")
-    #print("topic is: " + topic)
     payload = (str(msg.payload))
-    #print("payload is: " + payload)
     #print("")
+    print("topic is: " + topic)
+    #print("payload is: " + payload)
 
     sensor = "Lampotila"
     if topic.endswith(sensor):
-        updateSheet.setTemp(ERROR_VALUE)
+        updateSheet.setTemp("N/A")
         #print(sensor)
         payload = (str(msg.payload))
         tmp = (payload.split(': '))
@@ -98,12 +95,11 @@ def on_message(client, userdata, msg):
         tmp = (tmp.strip('}\''))
         temp = tmp.replace(".", ",")
         updateSheet.setTemp(temp)
-        #testing = updateSheet.getTemp()
-        #print("Temperature is: " + str(testing))
+        #print("Temperature is:" + updateSheet.getTemp())
 
     sensor = "Ilmanpaine"
     if topic.endswith(sensor):
-        updateSheet.setBaro(ERROR_VALUE)
+        updateSheet.setBaro("N/A")
         #print(sensor)
         payload = (str(msg.payload))
         tmp = (payload.split(': '))
@@ -111,12 +107,11 @@ def on_message(client, userdata, msg):
         tmp = (tmp.strip('}\''))
         baro = tmp.replace(".", ",")
         updateSheet.setBaro(baro)
-        #testing = updateSheet.getBaro()
-        #print("Barometer is: " + str(testing))
+        #print("Barometer is:" + updateSheet.getBaro())
 
-    sensor = "Korkeus";
+    sensor = "Korkeus"
     if topic.endswith(sensor):
-        updateSheet.setAlti(ERROR_VALUE)
+        updateSheet.setAlti("N/A")
         #print(sensor)
         payload = (str(msg.payload))
         tmp = (payload.split(': '))
@@ -124,12 +119,11 @@ def on_message(client, userdata, msg):
         tmp = (tmp.strip('}\''))
         alti = tmp.replace(".", ",")
         updateSheet.setAlti(alti)
-        #testing = updateSheet.getAlti()
-        #print("Altitude is:" + str(testing))
+        #print("Altitude is:" + updateSheet.getAlti())
 
-    sensor = "Ilmankosteus";
+    sensor = "Ilmankosteus"
     if topic.endswith(sensor):
-        updateSheet.setHumid(ERROR_VALUE)
+        updateSheet.setHumid("N/A")
         #print(sensor)
         payload = (str(msg.payload))
         tmp = (payload.split(':'))
@@ -137,8 +131,30 @@ def on_message(client, userdata, msg):
         tmp = (tmp.strip('}\''))
         humid = tmp.replace(".", ",")
         updateSheet.setHumid(humid)
-        #testing = updateSheet.getHumid()
-        #print("Humidity is: " + str(testing))
+        #print("Humidity is:" + updateSheet.getHumid())
+
+    sensor = "Valoisuus"
+    if topic.endswith(sensor):
+        updateSheet.setALS("N/A")
+        #print(sensor)
+        payload = (str(msg.payload))
+        tmp = (payload.split(':'))
+        tmp = tmp.pop(1)
+        tmp = (tmp.strip('}\''))
+        als = tmp.replace(".", ",")
+        updateSheet.setALS(als)
+        #print("AmbientLight  is:" + updateSheet.getALS())
+
+    sensor = "Vcc"
+    if topic.endswith(sensor):
+        #print(sensor)
+        payload = (str(msg.payload))
+        tmp = (payload.split(': '))
+        tmp = tmp.pop(1)
+        tmp = (tmp.strip('}\''))
+        vcc = tmp.replace(".", ",")
+        updateSheet.setVcc(vcc)
+        # print("Vcc is :" + updateSheet.getVcc())
 
     sensor = "NodeInfo"
     if topic.endswith(sensor):
@@ -148,43 +164,29 @@ def on_message(client, userdata, msg):
         tmp = tmp.pop(1)
         node_info = tmp.strip('}\'')
         tmp = (node_info.split('/'))
-
         nodemcu = tmp.pop(0)
         updateSheet.setNodeMcu(nodemcu)
-        #testing = updateSheet.getNodeMcu()
-        #print("nodemcu is:      " + testing)
-
+        #print("Nodemcu is:" + updateSheet.getNodeMcu())
         sens = tmp.pop(0)
         updateSheet.setSensor(sens)
-        #testing = updateSheet.getSensor()
-        #print("Sensor is:      " + testing)
-
+        #print("Sensor is:" + updateSheet.getSensor())
         node = tmp.pop(0)
         updateSheet.setNodeID(node)
         #print("")
-        #testing = updateSheet.getNodeID()
-        # print("NodeID is:" + testing)
-
+        #print("NodeID is:" + updateSheet.getNodeID())
         failcount = tmp.pop(0)
         updateSheet.setFailCount(failcount)
-        #testing = updateSheet.getFailCount()
-        #print("FailCount is:   " + testing)
-
-        vcc_batt = tmp.pop(0)
-        updateSheet.setVccBatt(vcc_batt)
-        #testing = updateSheet.getVccBatt()
-        #print("VccBatt is:   " + testing)
+        #print("FailCount is:" + updateSheet.getFailCount())
 
     sensor = "TopicInfo"
     if topic.endswith(sensor):
         #print(sensor)
         payload = (str(msg.payload))
-        tmp = (payload.split(':'))
+        tmp = (payload.split(': '))
         tmp = tmp.pop(1)
         location = tmp.strip('}\'')
         updateSheet.setLocation(str(location))
-        #testing = updateSheet.getLocation()
-        #print("Location is:     " + testing)
+        #print("Location is:" + updateSheet.getLocation())
 
 #*******************************************************************************
 #*******************************************************************************

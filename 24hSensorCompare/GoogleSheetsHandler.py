@@ -54,7 +54,7 @@ class WriteNodeDataToSheet:
         self.alti       = "N/A"
         self.als        = "N/A"
         self.failCount  = "?"
-        self.vcc   = "N/A"
+        self.vcc        = "N/A"
         self.nodemcu    = "Unknown MCU!"
         self.sensor     = "Unknown SENSOR!"
         self.node_id    = "Unknown NODE!"
@@ -85,8 +85,8 @@ class WriteNodeDataToSheet:
         now = datetime.datetime.today()
         self.date = now.strftime(d_format)
         self.time = now.strftime(t_format)
-        #print("\n" + self.date + " " + self.time )
-        print(self.date + " " + self.time )
+        print("\n" + self.date + " " + self.time )
+        #print(self.date + " " + self.time )
 
         if self.node_id == "NODE-01":
             value_range      = SHEET_NAME + value_range1
@@ -94,7 +94,6 @@ class WriteNodeDataToSheet:
             node_info_range  = node_info_range1
             START_COLUMN_INDEX = 0
             END_COLUMN_INDEX = 4
-            #COLUMN_INDEX = 0
 
         elif self.node_id == "NODE-02":
             value_range      = SHEET_NAME + value_range2
@@ -102,23 +101,20 @@ class WriteNodeDataToSheet:
             node_info_range  = node_info_range2
             START_COLUMN_INDEX = 5
             END_COLUMN_INDEX = 9
-            #COLUMN_INDEX = 5
 
         elif self.node_id == "NODE-03":
             value_range      = SHEET_NAME + value_range3
             node_topic_range = node_topic_range3
             node_info_range  = node_info_range3
             START_COLUMN_INDEX = 10
-            END_COLUMN_INDEX = 14
-            #COLUMN_INDEX = 10
+            END_COLUMN_INDEX = 16
 
         elif self.node_id == "NODE-04":
             value_range      = SHEET_NAME + value_range4
             node_topic_range = node_topic_range4
             node_info_range  = node_info_range4
-            START_COLUMN_INDEX = 16
-            END_COLUMN_INDEX = 20
-            #COLUMN_INDEX = 10
+            START_COLUMN_INDEX = 17
+            END_COLUMN_INDEX = 23
 
         else:
             print('Set NODE!')
@@ -147,28 +143,39 @@ class WriteNodeDataToSheet:
                 }
             }
         ]
-        # Write location to 'node_topic_range_name'
+        # Write location.
         request =   service.spreadsheets().values().update(
                     spreadsheetId=SPREADSHEET_ID,
                     range = SHEET_NAME + node_topic_range,
                     valueInputOption='USER_ENTERED',
-                    #body={'values': [[self.failCount, self.location ]]})
                     body={'values': [[self.location ]]})
         request.execute()
         print("Location   : " + self.location)
+        self.location = "Unknown LOCATION!"
 
-        # Write nodeInfo
+        # Write nodeInfo.
+        if (self.sensor == "DHT11" or self.sensor == "DHT22"):
+            bodyValues = [ self.node_id, self.nodemcu, self.sensor, self.failCount] #DHT sensors
+        else:
+            bodyValues = [ self.node_id, self.nodemcu, self.sensor, self.failCount, self.alti] #BMP sensors
+
         request =   service.spreadsheets().values().update(
                     spreadsheetId=SPREADSHEET_ID,
                     range = SHEET_NAME + node_info_range,
                     valueInputOption='USER_ENTERED',
-                    body={'values': [[ self.node_id, self.nodemcu, self.sensor, self.failCount, self.alti]]})
+                    body={'values': [bodyValues]})
+                    #body={'values': [[ self.node_id, self.nodemcu, self.sensor, self.failCount, self.alti]]})
         request.execute()
         print("NodeID     : " + self.node_id)
         print("NodeMcu    : " + self.nodemcu)
         print("Sensor     : " + self.sensor)
         print("Altitude   : " + self.alti)
         print("Error count: " + self.failCount)
+        #self.node_id    = "Unknown NODE!"
+        #self.nodemcu    = "Unknown MCU!"
+        #self.sensor     = "Unknown SENSOR!"
+        #self.alti       = "N/A"
+        #self.failCount  = "?"
 
         if (self.sensor == "DHT11" or self.sensor == "DHT22"):
             if ( self.temp == ERROR_VALUE):
@@ -211,7 +218,7 @@ class WriteNodeDataToSheet:
                 self.temp  = "N/A"
                 self.humid = "N/A"
 
-        elif (self.sensor == "BMP180" or self.sensor == "BMP180+ALS" or self.sensor == "BMP280" or self.sensor == "BME280"):
+        elif (self.sensor == "BMP180" or self.sensor == "BMP180+ALS" or self.sensor == "BMP280" or self.sensor == "BME280" or self.sensor == "BMP280+ALS"):
             if ( self.temp == ERROR_VALUE or self.humid == ERROR_VALUE or self.baro == ERROR_VALUE ):
                 print("ERROR VALUE, Sensor: ", self.sensor)
             else:

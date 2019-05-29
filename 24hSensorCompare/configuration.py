@@ -73,30 +73,41 @@ value_range4         = '!R'+ str(MIN_ROW)
 node_info_range4     = '!R2'
 node_topic_range4    = '!R3'
 
+#SUBS = "TESTING"
+SUBS = "SUBSALL"
 
-subscription = ("Koti/Olohuone/Lampotila",  # NODE-01 / DHT11
-                "Koti/Olohuone/Ilmankosteus",
-                "Koti/Olohuone/NodeInfo",
-                "Koti/Olohuone/TopicInfo",
-                "Koti/Ulkoilma/Lampotila",  # NODE-02 / DHT22
-                "Koti/Ulkoilma/Ilmankosteus",
-                "Koti/Ulkoilma/NodeInfo",
-                "Koti/Ulkoilma/TopicInfo",
-                "Koti/Partsi/Lampotila",# NODE-03 / BMP180 & TEMT6000
-                "Koti/Partsi/Ilmanpaine",
-                "Koti/Partsi/Korkeus",
-                "Koti/Partsi/Valoisuus",
-                "Koti/Partsi/Vcc",
-                "Koti/Partsi/NodeInfo",
-                "Koti/Partsi/TopicInfo",
-                "Koti/Parveke/Lampotila",# NODE-04 / BMP280
-                "Koti/Parveke/Ilmanpaine",
-                "Koti/Parveke/Korkeus",
-                #"Koti/Parveke/Valoisuus",
-                #"Koti/Parveke/Vcc",
-                "Koti/Parveke/NodeInfo",
-                "Koti/Parveke/TopicInfo"
-                )
+if SUBS == "TESTING":
+    subscription = (
+        "Koti/Partsi/NodeInfo",     # NODE-04 / BMP280 & TEMT6000
+        "Koti/Partsi/TopicInfo",
+        "Koti/Partsi/Lampotila",
+        "Koti/Partsi/Ilmanpaine",
+        "Koti/Partsi/Korkeus",
+        "Koti/Partsi/Valoisuus"
+        )
+else:
+    subscription = (
+        "Koti/Olohuone/NodeInfo",       # NODE-01 / DHT11
+        "Koti/Olohuone/TopicInfo",
+        "Koti/Olohuone/Lampotila",
+        "Koti/Olohuone/Ilmankosteus",
+        "Koti/Ulkoilma/NodeInfo",       # NODE-02 / DHT22
+        "Koti/Ulkoilma/TopicInfo",
+        "Koti/Ulkoilma/Lampotila",
+        "Koti/Ulkoilma/Ilmankosteus",
+        "Koti/Parveke/NodeInfo",        # NODE-03 / BMP280
+        "Koti/Parveke/TopicInfo",
+        "Koti/Parveke/Lampotila",
+        "Koti/Parveke/Ilmanpaine",
+        "Koti/Parveke/Korkeus",
+        "Koti/Parveke/Vcc",
+        "Koti/Partsi/NodeInfo",     # NODE-04 / BMP280 & TEMT6000
+        "Koti/Partsi/TopicInfo",
+        "Koti/Partsi/Lampotila",
+        "Koti/Partsi/Ilmanpaine",
+        "Koti/Partsi/Korkeus",
+        "Koti/Partsi/Valoisuus",
+        )
 
 # Select mqtt server connect to
 #mqtt_connect_to = ("192.168.10.50", 1883, 60) # Phone, DEMO / RPI3, Wlan
@@ -113,13 +124,13 @@ SPREADSHEET_ID  = '1bZ0gfiIlpTnHn-vMSA-m9OzVQEtF1l7ELNo40k0EBcM'
 # If modifying these scopes, delete the file token.pickle.
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 
-if SHEET_NAME== "CompareData":
+if SHEET_NAME == "CompareData":
     SHEET_ID = 0 # CompareData
 
-elif SHEET_NAME== "SleepTest":
+elif SHEET_NAME == "SleepTest":
     SHEET_ID = 1529352488 # SleepTest
 
-elif SHEET_NAME== "SensorData":
+elif SHEET_NAME == "SensorData":
     SHEET_ID = 2099931552 #SensorData
 
 else:

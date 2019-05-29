@@ -1,10 +1,8 @@
 #!/usr/bin/ python3
 
-# ToDo: support for AmbientLightSensor TEMT6000
-# ToDO: Baseline for ESP32 branch, cleanup
 """---------------------------- Version history --------------------------------
-    v1.3    yasperzee   5'19    Remove DHT11 and DHT22 support
-    v1.2.3  yasperzee   5'19    SleepTest
+    v1.4    yasperzee   5'19    Cleaning for Release
+    v1.3    yasperzee   5'19    ALS support (TEMT6000)
     v1.2.2  yasperzee   5'19    Sheet header updated
     v1.2.1  yasperzee   5'19    Branch to compare sensors 24h cycle
                                 GoogleSheetsApi Copy/Paste request method
@@ -32,6 +30,7 @@
     v0.1    yasperzee   4'19    Classes moved to separate modules
                 Classes to write sensor data to sheet for weather_esp01_dht_http.py
 
+#TODO: Merge SleepTest and compare branhces, selection on configuration
 -----------------------------------------------------------------------------"""
 import os.path
 import pickle
@@ -49,13 +48,13 @@ class WriteNodeDataToSheet:
     def __init__(self):
         self.date       = "Empty!"
         self.time       = "Empty!"
-        self.temp       = ERROR_VALUE
-        self.humid      = ERROR_VALUE
-        self.baro       = ERROR_VALUE
-        self.alti       = ERROR_VALUE
-        #self.light       = ERROR_VALUE
+        self.temp       = "N/A"
+        self.humid      = "N/A"
+        self.baro       = "N/A"
+        self.alti       = "N/A"
+        self.als        = "N/A"
         self.failCount  = "?"
-        self.vcc_batt   = "??"
+        self.vcc        = "N/A"
         self.nodemcu    = "Unknown MCU!"
         self.sensor     = "Unknown SENSOR!"
         self.node_id    = "Unknown NODE!"
@@ -87,86 +86,200 @@ class WriteNodeDataToSheet:
         self.date = now.strftime(d_format)
         self.time = now.strftime(t_format)
         print("\n" + self.date + " " + self.time )
+        #print(self.date + " " + self.time )
 
-        START_ROW_INDEX = MIN_ROW-1
-        END_ROW_INDEX = MAX_ROW
-        if self.node_id == "NODE-03":
-            node_info_range  = node_info_range3
-            node_topic_range = node_topic_range3
-            value_range      = value_range3
+        if self.node_id == "NODE-00": # Sleep Test
+            value_range      = SHEET_NAME + value_range1
+            node_topic_range = node_topic_range1
+            node_info_range  = node_info_range1
             START_COLUMN_INDEX = 0
-            END_COLUMN_INDEX   = 5
+            END_COLUMN_INDEX    = 5
+
+        elif self.node_id == "NODE-01":
+            value_range      = SHEET_NAME + value_range1
+            node_topic_range = node_topic_range1
+            node_info_range  = node_info_range1
+            START_COLUMN_INDEX = 0
+            END_COLUMN_INDEX = 4
+
+        elif self.node_id == "NODE-02":
+            value_range      = SHEET_NAME + value_range2
+            node_topic_range = node_topic_range2
+            node_info_range  = node_info_range2
+            START_COLUMN_INDEX = 5
+            END_COLUMN_INDEX = 9
+
+        elif self.node_id == "NODE-03":
+            value_range      = SHEET_NAME + value_range3
+            node_topic_range = node_topic_range3
+            node_info_range  = node_info_range3
+            START_COLUMN_INDEX = 10
+            END_COLUMN_INDEX = 16
+
+        elif self.node_id == "NODE-04":
+            value_range      = SHEET_NAME + value_range4
+            node_topic_range = node_topic_range4
+            node_info_range  = node_info_range4
+            START_COLUMN_INDEX = 17
+            END_COLUMN_INDEX = 23
+
         else:
-            print('Select Sensor!')
+            print('Set NODE!')
+            # try:
 
-        # Write nodeInfo
-        request =   service.spreadsheets().values().update(
-                    spreadsheetId=SPREADSHEET_ID,
-                    range = SHEET_NAME + node_info_range,
-                    valueInputOption='USER_ENTERED',
-                    body={'values': [[ self.node_id, self.nodemcu, self.sensor]]})
-        request.execute()
-        print("NodeID     : " + self.node_id)
-        print("NodeMcu    : " + self.nodemcu)
-        print("Sensor     : " + self.sensor)
-
-        # Write location and error count to 'node_topic_range_name'
+        batch_update_spreadsheet_request_body = [
+            {
+            "copyPaste": {
+                "source": {
+                    "sheetId": SHEET_ID,
+                    "startRowIndex": START_ROW_INDEX,
+                    "endRowIndex": END_ROW_INDEX,
+                    "startColumnIndex": START_COLUMN_INDEX,
+                    "endColumnIndex": END_COLUMN_INDEX
+                    },
+                "destination": {
+                    "sheetId": SHEET_ID,
+                    "startRowIndex": MIN_ROW,
+                    "endRowIndex": END_ROW_INDEX+1,
+                    "startColumnIndex": START_COLUMN_INDEX,
+                    "endColumnIndex": END_COLUMN_INDEX
+                    },
+                    #"pasteType": "PASTE_NORMAL".
+                    "pasteType": "PASTE_VALUES",
+                    "pasteOrientation": "NORMAL"
+                }
+            }
+        ]
+        # Write location.
         request =   service.spreadsheets().values().update(
                     spreadsheetId=SPREADSHEET_ID,
                     range = SHEET_NAME + node_topic_range,
                     valueInputOption='USER_ENTERED',
-                    body={'values': [[self.failCount, self.location ]]})
+                    body={'values': [[self.location ]]})
         request.execute()
-        print("Location   :"  + self.location)
-        print("Error count: " + self.failCount)
+        print("Location   : " + self.location)
+        self.location = "Unknown LOCATION!"
 
-        if (self.sensor == "BMP180" or self.sensor == "BMP280"):
-            if ( self.temp == ERROR_VALUE or self.baro == ERROR_VALUE or self.alti == ERROR_VALUE):
-                print("ERROR VALUE, Sensor: ", self.sensor)
+        # Write nodeInfo.
+        if (self.sensor == "DHT11" or self.sensor == "DHT22"):
+            bodyValues = [ self.node_id, self.nodemcu, self.sensor, self.failCount] #DHT sensors
+        else:
+            bodyValues = [ self.node_id, self.nodemcu, self.sensor, self.failCount, self.alti] #BMP sensors
+
+        request =   service.spreadsheets().values().update(
+                    spreadsheetId=SPREADSHEET_ID,
+                    range = SHEET_NAME + node_info_range,
+                    valueInputOption='USER_ENTERED',
+                    body={'values': [bodyValues]})
+        request.execute()
+
+        print("NodeID     : " + self.node_id)
+        print("NodeMcu    : " + self.nodemcu)
+        print("Sensor     : " + self.sensor)
+        print("Altitude   : " + self.alti)
+        print("Error count: " + self.failCount)
+        #self.node_id    = "Unknown NODE!"
+        #self.nodemcu    = "Unknown MCU!"
+        #self.sensor     = "Unknown SENSOR!"
+        #self.alti       = "N/A"
+        #self.failCount  = "?"
+
+        if (self.sensor == "DHT11" or self.sensor == "DHT22"):
+            if ( self.temp == ERROR_VALUE):
+                print("ERROR VALUE: Sensor = ", self.sensor)
+                print("")
             else:
                 # 1) copy and paste data area one row down
-                batch_update_spreadsheet_request_body = [
-                    {
-                    "copyPaste": {
-                        "source": {
-                            "sheetId": SHEET_ID,
-                            "startRowIndex": START_ROW_INDEX,
-                            "endRowIndex": END_ROW_INDEX ,
-                            "startColumnIndex": START_COLUMN_INDEX,
-                            "endColumnIndex": END_COLUMN_INDEX
-                            },
-                        "destination": {
-                            "sheetId": SHEET_ID,
-                            "startRowIndex": START_ROW_INDEX+1,
-                            "endRowIndex": END_ROW_INDEX+1,
-                            "startColumnIndex": START_COLUMN_INDEX,
-                            "endColumnIndex": END_COLUMN_INDEX
-                            },
-                            #"pasteType": "PASTE_NORMAL".
-                            "pasteType": "PASTE_VALUES",
-                            "pasteOrientation": "NORMAL"
-                        }
-                    }
-                ]
-                request =   service.spreadsheets().batchUpdate(
+                request = service.spreadsheets().batchUpdate(
+                spreadsheetId=SPREADSHEET_ID,
+                body = {'requests': [batch_update_spreadsheet_request_body]})
+                response = request.execute()
+
+                # 2) Update date, time and values to MIN_ROW
+                if (self.humid == ERROR_VALUE): # Update temperature only to sheet
+                    result =    service.spreadsheets().values().update(
+                                spreadsheetId = SPREADSHEET_ID,
+                                range= value_range,
+                                valueInputOption='USER_ENTERED',
+                                body={'values': [[ self.date, self.time, self.temp]]}) # Temperature only from DHT
+                    result.execute()
+
+                    print("Temperature:{:>7}".format(self.temp))
+                    self.temp = "N/A"
+
+                else:  # Update temperature and humidity to sheet
+                    result =    service.spreadsheets().values().update(
+                                spreadsheetId = SPREADSHEET_ID,
+                                range= value_range,
+                                valueInputOption='USER_ENTERED',
+                                body={'values': [[ self.date, self.time, self.temp, self.humid]]}) #DHT11 & DH22
+                    result.execute()
+
+                # 3) Clear row MAX_ROW+1
+                request =   service.spreadsheets().values().clear(
                             spreadsheetId=SPREADSHEET_ID,
-                            body = {'requests': [batch_update_spreadsheet_request_body]})
+                            range = (SHEET_NAME + '!A'+ str(MAX_ROW+1) + ':' + 'O' + str(MAX_ROW+1)))
                 request.execute()
+                print("Temperature:{:>7}".format(self.temp))
+                print("Humidity   :{:>7}".format(self.humid))
+                self.temp  = "N/A"
+                self.humid = "N/A"
+
+        elif (self.sensor == "BMP180" or self.sensor == "BMP180+ALS" or self.sensor == "BMP280" or self.sensor == "BME280" or self.sensor == "BMP280+ALS"):
+            if ( self.temp == ERROR_VALUE or self.humid == ERROR_VALUE or self.baro == ERROR_VALUE ):
+                print("ERROR VALUE, Sensor: ", self.sensor)
+            else:
+                print("BMP sensor OK: ")
+                # 1) copy and paste data area one row down
+                request = service.spreadsheets().batchUpdate(
+                spreadsheetId=SPREADSHEET_ID,
+                body = {'requests': [batch_update_spreadsheet_request_body]})
+                response = request.execute()
+
+                #if self.sensor == "BME280":
+                    #  bodyValues = [ self.date, self.time, self.temp, self.baro, self.humid, self.vcc, self.als] ##BME280
+                #else:
+                bodyValues = [ self.date, self.time, self.temp, self.baro, self.vcc, self.als] ##BMP180 & BMP280
 
                 # 2) Update date, time and values to MIN_ROW
                 result =    service.spreadsheets().values().update(
                             spreadsheetId = SPREADSHEET_ID,
                             range= value_range,
                             valueInputOption='USER_ENTERED',
-                            body={'values': [[ self.date, self.time, self.temp, self.baro, self.vcc_batt,self.alti ]]}) #BMP180 & BMP280
+                            body={'values': [bodyValues]})
                 result.execute()
-                print("Temperature:{:>7}".format(self.temp))
-                print("Barometer  :{:>7}".format(self.baro))
-                print("Altitude   :{:>7}".format(self.alti))
-                print("Vcc Batt   :{:>7}".format(self.vcc_batt))
-                self.temp = ERROR_VALUE
-                self.baro = ERROR_VALUE
-                self.alti = ERROR_VALUE
+                if (self.temp == "N/A"):
+                    print("Temperature: ", self.temp)
+                else:
+                    print("Temperature:{:>7}".format(self.temp))
+                if (self.baro == "N/A"):
+                    print("Barometer  : ", self.baro)
+                else:
+                    print("Barometer  :{:>7}".format(self.baro))
+                if (self.alti == "N/A"):
+                    print("Altitude   : ", self.alti)
+                else:
+                    print("Altitude   :{:>7}".format(self.alti))
+
+                if (self.humid == "N/A"):
+                    print("Humidity   : ", self.humid)
+                else:
+                    print("Humidity   :{:>7}".format(self.humid))
+                if (self.als == "N/A"):
+                    print("Lightness  : ", self.als)
+                else:
+                    print("Lightness  :{:>7}".format(self.als))
+                if (self.vcc == "N/A"):
+                    print("Vcc        : ", self.vcc)
+                else:
+                    print("Vcc        :{:>7}".format(self.vcc))
+
+                self.temp = "N/A"
+                self.baro = "N/A"
+                self.alti = "N/A"
+                self.humid = "N/A"
+                self.als = "N/A"
+                self.vcc = "N/A"
 
                 # 3) Clear row MAX_ROW+1
                 request =   service.spreadsheets().values().clear(
@@ -175,6 +288,11 @@ class WriteNodeDataToSheet:
                 request.execute()
 
     # Getters & Setters
+    def getUnsubscribe(self):
+        return self.unsubscribe
+    def setUnsubscribe(self, unsubscribe):
+        self.unsubscribe = unsubscribe
+
     def getTime(self):
         return self.time
     def setTime(self, time):
@@ -215,10 +333,10 @@ class WriteNodeDataToSheet:
     def setFailCount(self, failcount):
         self.failCount = failcount
 
-    def getVccBatt(self):
-        return self.vcc_batt
-    def setVccBatt(self, vcc_batt):
-        self.vcc_batt = vcc_batt
+    def getVcc(self):
+        return self.vcc
+    def setVcc(self, vcc):
+        self.vcc = vcc
 
     def getNodeMcu(self):
         return self.nodemcu
@@ -234,6 +352,11 @@ class WriteNodeDataToSheet:
         return self.location
     def setLocation(self, location):
         self.location = location
+
+    def getALS(self):
+        return self.als
+    def setALS(self, als):
+        self.als = als
 
 class Gredentials:
 # The file token.pickle stores the user's access and refresh tokens, and is
