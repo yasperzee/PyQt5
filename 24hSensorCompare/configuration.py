@@ -19,13 +19,8 @@
     v0.1    yasperzee   4'19    Configurations for weather_esp01_dht_http.py
                                 Classes moved to separate modules
 
-#TODD:
+#TODD: Prepare project stucture for Docker
 -----------------------------------------------------------------------------"""
-
-# Supported sensors
-# DHT11, DHT22, BMP180, BMP280, BME280, TEMT6000
-# Verified sensors
-# DHT11, DHT22, BMP180, BMP280, TEMT6000
 
 """ Select some Topics to subscribe or add your ownones
 "$SYS/#"
@@ -40,87 +35,109 @@
 "Koti/Olohuone/Korkeus"
 "Koti/Olohuone/Valoisuus"
 "Koti/Olohuone/NodeInfo"  # To find correct sheet on spreadsheet
-"Koti/Olohuone/TopicInfo" # For location of node
+"Koti/Olohuone/TopicInfo" # Location of the node
 """
-# First row to write data
-MIN_ROW = 5
-# Make sure there is at least MAX_ROW+1 rows in sheet
-#MAX_ROW     = 96 + MIN_ROW # 15min update interval => 96 records / 24h
-MAX_ROW = 288 + MIN_ROW # 5min update interval => 288 records / 24h
 
-START_ROW_INDEX = MIN_ROW-1
-END_ROW_INDEX = MAX_ROW
+#SUBS = "SLEEP_TESTING"
+SUBS = "TESTING"
+#SUBS = "SUBSALL"
 
-# Sheet named 'SHEET_NAME' must exist on Spreadsheet
-SHEET_NAME   = "CompareData"
-#SHEET_NAME   = "SleepTest"
-#SHEET_NAME   = "SensorData"
-
-# Range on sheet to write value, node info & topic(location)
-value_range1         = '!A'+ str(MIN_ROW)
-node_info_range1     = '!A2'
-node_topic_range1    = '!A3'
-
-value_range2         = '!F'+ str(MIN_ROW)
-node_info_range2     = '!F2'
-node_topic_range2    = '!F3'
-
-value_range3         = '!K'+ str(MIN_ROW)
-node_info_range3     = '!K2'
-node_topic_range3    = '!K3'
-
-value_range4         = '!R'+ str(MIN_ROW)
-node_info_range4     = '!R2'
-node_topic_range4    = '!R3'
-
-#SUBS = "TESTING"
-SUBS = "SUBSALL"
-
-if SUBS == "TESTING":
+if SUBS == "SLEEP_TESTING":
     subscription = (
-        "Koti/Partsi/NodeInfo",     # NODE-04 / BMP280 & TEMT6000
-        "Koti/Partsi/TopicInfo",
-        "Koti/Partsi/Lampotila",
-        "Koti/Partsi/Ilmanpaine",
-        "Koti/Partsi/Korkeus",
-        "Koti/Partsi/Valoisuus"
+        "Koti/Testing/TopicInfo",       # NODE-00 / BMP280
+        "Koti/Testing/NodeInfo",
+        "Koti/Testing/Lampotila",
+        "Koti/Testing/Ilmanpaine",
+        "Koti/Testing/Korkeus",
+        "Koti/Testing/Vcc"
+        )
+elif SUBS == "TESTING":
+    subscription = (
+        "Koti/Parveke/NodeInfo",        # NODE-04 / BMP280 & TEMT6000 (ESP12E)
+        "Koti/Parveke/TopicInfo",
+        "Koti/Parveke/Lampotila"
         )
 else:
     subscription = (
-        "Koti/Olohuone/NodeInfo",       # NODE-01 / DHT11
+        "Koti/Olohuone/NodeInfo",       # NODE-01 / DHT11 (ESP01)
         "Koti/Olohuone/TopicInfo",
         "Koti/Olohuone/Lampotila",
         "Koti/Olohuone/Ilmankosteus",
-        "Koti/Ulkoilma/NodeInfo",       # NODE-02 / DHT22
+        "Koti/Ulkoilma/NodeInfo",       # NODE-02 / DHT22 (ESP01)
         "Koti/Ulkoilma/TopicInfo",
         "Koti/Ulkoilma/Lampotila",
         "Koti/Ulkoilma/Ilmankosteus",
-        "Koti/Parveke/NodeInfo",        # NODE-03 / BMP280
+        "Koti/Keittio/NodeInfo",        # NODE-03 / BMP180 (ESP01)
+        "Koti/Keittio/TopicInfo",
+        "Koti/Keittio/Lampotila",
+        "Koti/Keittio/Ilmanpaine",
+        "Koti/Keittio/Korkeus",
+        "Koti/Parveke/NodeInfo",        # NODE-04 / BMP280 & TEMT6000 (ESP12E)
         "Koti/Parveke/TopicInfo",
         "Koti/Parveke/Lampotila",
         "Koti/Parveke/Ilmanpaine",
         "Koti/Parveke/Korkeus",
-        "Koti/Parveke/Vcc",
-        "Koti/Partsi/NodeInfo",     # NODE-04 / BMP280 & TEMT6000
+        "Koti/Parveke/Valoisuus",
+        "Koti/Partsi/NodeInfo",         # NODE-05 / BMP280 (ESP12E)
         "Koti/Partsi/TopicInfo",
         "Koti/Partsi/Lampotila",
         "Koti/Partsi/Ilmanpaine",
         "Koti/Partsi/Korkeus",
-        "Koti/Partsi/Valoisuus",
+        "Koti/Partsi/Vcc"
         )
 
+# Sheet named 'SHEET_NAME' must exist on Spreadsheet
+SHEET_NAME = "CompareData"
+#SHEET_NAME = "SleepTest"
+#SHEET_NAME = "SensorData"
+
 # Select mqtt server connect to
-#mqtt_connect_to = ("192.168.10.50", 1883, 60) # Phone, DEMO / RPI3, Wlan
-#mqtt_connect_to = ("192.168.10.52", 1883, 60) # Local RPI3, LAN
-#mqtt_connect_to = ("192.168.10.34", 1883, 60) # Local W530
-mqtt_connect_to = ("192.168.10.63", 1883, 60) # Local NP-510
+#MQTT_HOST = "192.168.10.50" # Phone, DEMO / RPI3, Wlan
+##MQTT_HOST = "192.168.10.52" # Local RPI3, LAN
+##MQTT_HOST = ("192.168.10.34" # Local W530
+MQTT_HOST = "192.168.10.63" # Local NP-510
 
 #MQTT_CLIENT_ID = "MqttClient_W530"
 #MQTT_CLIENT_ID = "MqttClient_RPI3"
 MQTT_CLIENT_ID = "MqttClient_N510"
+#MQTT_CLIENT_ID = "SleepTest_"
 
+## First row to write data ( Header is 4 rows )
+MIN_ROW = 5
+# Make sure there is at least MAX_ROW+1 rows in sheet!
+#MAX_ROW = 96 + MIN_ROW # 15min update interval => 96 records / day(24h)
+MAX_ROW = 288 + MIN_ROW # 15min update interval => 288 records / 72h
+#MAX_ROW = 672 + MIN_ROW # 15min update interval => 672 records / week(7days)
+#MAX_ROW = 2688 + MIN_ROW # 15min update interval => 2688 records / month(4wk)
+#MAX_ROW = 32256 + MIN_ROW # 15min update interval => 32256 records / year(12months)
+         # 5 SENSORS --> 4*(7+4)+(5*(7+4)*32256) columns = 967 680 cells / year
+
+# Range on sheet to write value, node info & topic(location)
+value_range1      = '!A'+ str(MIN_ROW)
+node_info_range1  = '!A2'
+node_topic_range1 = '!A3'
+value_range2      = '!F'+ str(MIN_ROW)
+node_info_range2  = '!F2'
+node_topic_range2 = '!F3'
+value_range3      = '!K'+ str(MIN_ROW)
+node_info_range3  = '!K2'
+node_topic_range3 = '!K3'
+value_range4      = '!R'+ str(MIN_ROW)
+node_info_range4  = '!R2'
+node_topic_range4 = '!R3'
+value_range5      = '!Y'+ str(MIN_ROW)
+node_info_range5  = '!Y2'
+node_topic_range5 = '!Y3'
+
+#Select port
+#TCP/IP port 1883 is reserved with IANA for use with MQTT.
+#TCP/IP port 8883 is also registered, for using MQTT over SSL.
+MQTT_PORT = 1883
+#MQTT_PORT = 8883
+
+MQTT_KEEPALIVE = 60 # Seconds 0..120
 # The ID of a spreadsheet.
-SPREADSHEET_ID  = '1bZ0gfiIlpTnHn-vMSA-m9OzVQEtF1l7ELNo40k0EBcM'
+SPREADSHEET_ID = '1bZ0gfiIlpTnHn-vMSA-m9OzVQEtF1l7ELNo40k0EBcM'
 # If modifying these scopes, delete the file token.pickle.
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 
@@ -135,6 +152,9 @@ elif SHEET_NAME == "SensorData":
 
 else:
     print('Select SHEET!')
-    # try:
+    # TODO: throw exception
 
 ERROR_VALUE = -999,9
+START_ROW_INDEX = MIN_ROW-1
+END_ROW_INDEX = MAX_ROW
+mqtt_params = (MQTT_HOST, MQTT_PORT, MQTT_KEEPALIVE, MQTT_CLIENT_ID)

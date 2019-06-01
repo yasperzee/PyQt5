@@ -50,6 +50,7 @@ MIN_ROW = 5
 MAX_ROW     = 672 + MIN_ROW # 15min update interval => 672 records / week(7days)
 #MAX_ROW     = 2688 + MIN_ROW # 15min update interval => 2688 records / month(4wk)
 #MAX_ROW     = 32256 + MIN_ROW # 15min update interval => 32256 records / year(12months)
+                # 5 SENSORS --> 4*(7+4)+(5*(7+4)*32256) columns = 967 680 cells / year
 
 START_ROW_INDEX = MIN_ROW-1
 END_ROW_INDEX = MAX_ROW
@@ -90,26 +91,31 @@ if SUBS == "TESTING":
         )
 else:
     subscription = (
-        "Koti/Olohuone/NodeInfo",       # NODE-01 / DHT11
+        "Koti/Olohuone/NodeInfo",       # NODE-01 / DHT11 (ESP01)
         "Koti/Olohuone/TopicInfo",
         "Koti/Olohuone/Lampotila",
         "Koti/Olohuone/Ilmankosteus",
-        "Koti/Ulkoilma/NodeInfo",       # NODE-02 / DHT22
+        "Koti/Ulkoilma/NodeInfo",       # NODE-02 / DHT22 (ESP01)
         "Koti/Ulkoilma/TopicInfo",
         "Koti/Ulkoilma/Lampotila",
         "Koti/Ulkoilma/Ilmankosteus",
-        "Koti/Parveke/NodeInfo",        # NODE-03 / BMP280
+        "Koti/Parveke/NodeInfo",        # NODE-03 / BMP280 (ESP12E)
         "Koti/Parveke/TopicInfo",
         "Koti/Parveke/Lampotila",
         "Koti/Parveke/Ilmanpaine",
         "Koti/Parveke/Korkeus",
         "Koti/Parveke/Vcc",
-        "Koti/Partsi/NodeInfo",     # NODE-04 / BMP280 & TEMT6000
+        "Koti/Partsi/NodeInfo",     # NODE-04 / BMP280 & TEMT6000 (ESP12E)
         "Koti/Partsi/TopicInfo",
         "Koti/Partsi/Lampotila",
         "Koti/Partsi/Ilmanpaine",
         "Koti/Partsi/Korkeus",
         "Koti/Partsi/Valoisuus",
+        "Koti/Keittio/NodeInfo",     # NODE-05 / BMP180 (ESP01)
+        "Koti/Keittio/TopicInfo",
+        "Koti/Keittio/Lampotila",
+        "Koti/Keittio/Ilmanpaine",
+        "Koti/Keittio/Korkeus"
         )
 
 # Select mqtt server connect to

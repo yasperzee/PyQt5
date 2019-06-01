@@ -121,7 +121,7 @@ class WriteNodeDataToSheet:
             node_topic_range = node_topic_range4
             node_info_range  = node_info_range4
             START_COLUMN_INDEX = 17
-            END_COLUMN_INDEX = 23
+            END_COLUMN_INDEX = 24
 
         else:
             print('Set NODE!')
