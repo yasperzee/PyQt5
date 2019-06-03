@@ -1,6 +1,8 @@
 #!/usr/bin/ python3
 
 """------------------------------ Version history ------------------------------
+
+    v1.5    yasperzee   6'19    mqtt_params is now dict
     v1.4    yasperzee   5'19    Cleaning for Release
     v1.3    yasperzee   5'19    ALS support (TEMT6000)
     v1.2.2  yasperzee   5'19    Sheet header updated
@@ -39,8 +41,8 @@
 """
 
 #SUBS = "SLEEP_TESTING"
-SUBS = "TESTING"
-#SUBS = "SUBSALL"
+#SUBS = "TESTING"
+SUBS = "SUBSALL"
 
 if SUBS == "SLEEP_TESTING":
     subscription = (
@@ -134,9 +136,9 @@ node_topic_range5 = '!Y3'
 #TCP/IP port 8883 is also registered, for using MQTT over SSL.
 MQTT_PORT = 1883
 #MQTT_PORT = 8883
-
 MQTT_KEEPALIVE = 60 # Seconds 0..120
 # The ID of a spreadsheet.
+
 SPREADSHEET_ID = '1bZ0gfiIlpTnHn-vMSA-m9OzVQEtF1l7ELNo40k0EBcM'
 # If modifying these scopes, delete the file token.pickle.
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
@@ -157,4 +159,9 @@ else:
 ERROR_VALUE = -999,9
 START_ROW_INDEX = MIN_ROW-1
 END_ROW_INDEX = MAX_ROW
-mqtt_params = (MQTT_HOST, MQTT_PORT, MQTT_KEEPALIVE, MQTT_CLIENT_ID)
+
+mqtt_params = ({'mqtt_host':MQTT_HOST,
+                'mqtt_port':MQTT_PORT,
+                'mqtt_keepalive':MQTT_KEEPALIVE,
+                'mqtt_clien_id':MQTT_CLIENT_ID
+                })

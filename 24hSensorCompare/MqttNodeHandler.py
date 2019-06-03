@@ -39,7 +39,7 @@
     v0.1    yasperzee   3'19    Eclipse paho-mqtt client testing
 
 #TODD: Prepare project stucture for Docker
-""""""--------------------------------------------------------------------------"""
+""""""-----------------------------------------------------------------------"""
 from __future__ import print_function
 import time
 
@@ -65,7 +65,7 @@ class ReadMqttData:
         topic = self.getTopic()
         payload = self.getPayload()
 
-        #print("set_data")
+        #print("On set_data")
         #print("set_data, topic is  :" + topic )
         #print("set_data, payload is:" + payload )
 
@@ -76,6 +76,7 @@ class ReadMqttData:
             tmp = (tmp.split(': '))
             tmp = tmp.pop(1)
             tmp = tmp.strip('}\'')
+            tmp = tmp.replace(".", ",")
             updateSheet.setTemp(tmp)
             #print("Temperature is:" + updateSheet.getTemp())
 
@@ -86,6 +87,7 @@ class ReadMqttData:
             tmp = (tmp.split(':'))
             tmp = tmp.pop(1)
             tmp = tmp.strip('}\'')
+            tmp = tmp.replace(".", ",")
             updateSheet.setBaro(tmp)
             #print("Barometer is:" + updateSheet.getBaro())
 
@@ -96,6 +98,7 @@ class ReadMqttData:
             tmp = (tmp.split(':'))
             tmp = tmp.pop(1)
             tmp = tmp.strip('}\'')
+            tmp = tmp.replace(".", ",")
             updateSheet.setAlti(tmp)
             #print("Altitude is:" + updateSheet.getAlti())
 
@@ -106,16 +109,18 @@ class ReadMqttData:
             tmp = (tmp.split(':'))
             tmp = tmp.pop(1)
             tmp = tmp.strip('}\'')
+            tmp = tmp.replace(".", ",")
             updateSheet.setHumid(tmp)
             #print("Humidity is:" + updateSheet.getHumid())
 
         nodefeat = "Valoisuus"
         if topic.endswith(nodefeat):
-            print("nodefeat: " + nodefeat)
+            #print("nodefeat: " + nodefeat)
             tmp = (str(payload))
             tmp = (tmp.split(':'))
             tmp = tmp.pop(1)
             tmp = tmp.strip('}\'')
+            tmp = tmp.replace(".", ",")
             updateSheet.setALS(tmp)
             #print("AmbientLight  is:" + updateSheet.getALS())
 
@@ -126,6 +131,7 @@ class ReadMqttData:
             tmp = (tmp.split(': '))
             tmp = tmp.pop(1)
             tmp = tmp.strip('}\'')
+            tmp = tmp.replace(".", ",")
             #print("Vcc is :" + updateSheet.getVcc())
 
         nodefeat = "NodeInfo"

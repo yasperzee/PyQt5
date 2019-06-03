@@ -61,12 +61,16 @@ class WriteNodeDataToSheet:
         # Supported APIs w/ versions: https://developers.google.com/api-client-library/python/apis/
         # https://developers.google.com/sheets/api/
         # Build the service object
+        #try
         service = build('sheets', 'v4', credentials=self.creds)
         if service == 0:
             print('build FAIL!')
+            # TODO: throw exception
+        #try
         spreadsheet = service.spreadsheets() # Returns the spreadsheets Resource.
         if spreadsheet == 0:
             print('service FAIL!')
+            # TODO: throw exception
 
         # Set and print date & time
         d_format = "%d-%b-%Y"
@@ -80,38 +84,38 @@ class WriteNodeDataToSheet:
             value_range      = SHEET_NAME + value_range1
             node_topic_range = node_topic_range1
             node_info_range  = node_info_range1
-            START_COLUMN_INDEX = 0 #A
-            END_COLUMN_INDEX = 5
+            START_COLUMN_INDEX = 0  #A
+            END_COLUMN_INDEX = 5    # date, time, temp, baro, Vcc
         elif self.node_id == "NODE-01":
             value_range      = SHEET_NAME + value_range1
             node_topic_range = node_topic_range1
             node_info_range  = node_info_range1
-            START_COLUMN_INDEX = 0 #A
-            END_COLUMN_INDEX = 4
+            START_COLUMN_INDEX = 0  #A
+            END_COLUMN_INDEX = 4    # date, time, temp, humid
         elif self.node_id == "NODE-02":
             value_range      = SHEET_NAME + value_range2
             node_topic_range = node_topic_range2
             node_info_range  = node_info_range2
-            START_COLUMN_INDEX = 5 #F
-            END_COLUMN_INDEX = 9
+            START_COLUMN_INDEX = 5  #F
+            END_COLUMN_INDEX = 9    # date, time, temp, humid
         elif self.node_id == "NODE-03":
             value_range      = SHEET_NAME + value_range3
             node_topic_range = node_topic_range3
             node_info_range  = node_info_range3
             START_COLUMN_INDEX = 10 #K
-            END_COLUMN_INDEX = 14
+            END_COLUMN_INDEX = 14   # date, time, temp, baro, (als to 1 row only)
         elif self.node_id == "NODE-04":
             value_range      = SHEET_NAME + value_range4
             node_topic_range = node_topic_range4
             node_info_range  = node_info_range4
             START_COLUMN_INDEX = 17 #R
-            END_COLUMN_INDEX = 22
+            END_COLUMN_INDEX = 22   # date, time, temp, baro, als
         elif self.node_id == "NODE-05":
             value_range      = SHEET_NAME + value_range5
             node_topic_range = node_topic_range5
             node_info_range  = node_info_range5
             START_COLUMN_INDEX = 24 #Y
-            END_COLUMN_INDEX = 29
+            END_COLUMN_INDEX = 29   # date, time, temp, baro, als
         else:
             print('Set NODE!')
             # TODO: throw exception
@@ -139,21 +143,23 @@ class WriteNodeDataToSheet:
                 }
             }
         ]
-        # Write location.
+        # Write location to the sheet.
+        bodyValues = [ self.location ]
         request =   service.spreadsheets().values().update(
                     spreadsheetId=SPREADSHEET_ID,
                     range = SHEET_NAME + node_topic_range,
                     valueInputOption='USER_ENTERED',
-                    body={'values': [[self.location ]]})
+                    body = {'values': [bodyValues]})
+                    #body={'values': [[self.location ]]})
         request.execute()
         print("Location   : " + self.location)
         self.location = "Unknown LOCATION!"
 
-        # Write nodeInfo.
+        # Write nodeInfo to the sheet.
         if (self.sensor == "DHT11" or self.sensor == "DHT22"):
-            bodyValues = [ self.node_id, self.nodemcu, self.sensor, self.failCount] #DHT sensors
+            bodyValues = [ self.node_id, self.nodemcu, self.sensor, self.failCount ] #DHT sensors
         else:
-            bodyValues = [ self.node_id, self.nodemcu, self.sensor, self.failCount, self.alti, self.vcc] #BMP sensors
+            bodyValues = [ self.node_id, self.nodemcu, self.sensor, self.failCount, self.alti, self.vcc ] #BMP sensors
 
         request =   service.spreadsheets().values().update(
                     spreadsheetId = SPREADSHEET_ID,
@@ -161,7 +167,6 @@ class WriteNodeDataToSheet:
                     valueInputOption = 'USER_ENTERED',
                     body = {'values': [bodyValues]})
         request.execute()
-
         print("NodeID     : " + self.node_id)
         print("NodeMcu    : " + self.nodemcu)
         print("Sensor     : " + self.sensor)
@@ -175,6 +180,9 @@ class WriteNodeDataToSheet:
         #self.failCount  = "?"
         #self.vcc       = "N/A"
 
+        if (self.sensor == "DHT22"):
+            self.humid = ERROR_VALUE
+
         if (self.sensor == "DHT11" or self.sensor == "DHT22"):
             if ( self.temp == ERROR_VALUE):
                 print("ERROR VALUE: Sensor = ", self.sensor)
@@ -186,33 +194,31 @@ class WriteNodeDataToSheet:
                 body = {'requests': [batch_update_spreadsheet_request_body]})
                 response = request.execute()
 
-                # 2) Update date, time and values to MIN_ROW
+                bodyValues = [ self.date, self.time, self.temp, self.humid ] #temp and humid
                 if (self.humid == ERROR_VALUE): # Update temperature only to sheet
-                    result =    service.spreadsheets().values().update(
-                                spreadsheetId = SPREADSHEET_ID,
-                                range = value_range,
-                                valueInputOption = 'USER_ENTERED',
-                                body = {'values': [[ self.date, self.time, self.temp]]}) # Temperature only from DHT
-                    result.execute()
+                    bodyValues = [ self.date, self.time, self.temp ] #temp only
 
-                    print("Temperature:{:>7}".format(self.temp))
-                    self.temp = "N/A"
-
-                else:  # Update temperature and humidity to sheet
-                    result =    service.spreadsheets().values().update(
-                                spreadsheetId = SPREADSHEET_ID,
-                                range = value_range,
-                                valueInputOption = 'USER_ENTERED',
-                                body = {'values': [[ self.date, self.time, self.temp, self.humid]]}) #DHT11 & DH22
-                    result.execute()
+                # 2) Update date, time and values to MIN_ROW
+                result =    service.spreadsheets().values().update(
+                             spreadsheetId = SPREADSHEET_ID,
+                             range = value_range,
+                             valueInputOption = 'USER_ENTERED',
+                             body = {'values': [bodyValues]})
+                result.execute()
+                print("Temperature:{:>7}".format(self.temp))
+                self.temp = "N/A"
 
                 # 3) Clear row MAX_ROW+1
+                #TODO: Do we need this at all?
                 request =   service.spreadsheets().values().clear(
                             spreadsheetId = SPREADSHEET_ID,
                             range = (SHEET_NAME + '!A'+ str(MAX_ROW+1) + ':' + 'O' + str(MAX_ROW+1)))
                 request.execute()
                 print("Temperature:{:>7}".format(self.temp))
-                print("Humidity   :{:>7}".format(self.humid))
+                if (self.humid == ERROR_VALUE):
+                    print("Humidity   : ", self.humid)
+                else:
+                    print("Humidity   :{:>7}".format(self.humid))
                 self.temp  = "N/A"
                 self.humid = "N/A"
 
@@ -260,7 +266,6 @@ class WriteNodeDataToSheet:
                     print("Lightness  : ", self.als)
                 else:
                     print("Lightness  :{:>7}".format(self.als))
-
                 self.temp = "N/A"
                 self.baro = "N/A"
                 self.alti = "N/A"
@@ -274,7 +279,7 @@ class WriteNodeDataToSheet:
                             range = (SHEET_NAME + '!A'+ str(MAX_ROW+1) + ':' + 'O' + str(MAX_ROW+1)))
                 request.execute()
 
-    # Getters & Setters
+# Getters & Setters
     def getUnsubscribe(self):
         return self.unsubscribe
     def setUnsubscribe(self, unsubscribe):
@@ -339,6 +344,11 @@ class WriteNodeDataToSheet:
         return self.location
     def setLocation(self, location):
         self.location = location
+
+    def getALS(self):
+        return self.als
+    def setALS(self, als):
+        self.als = als
 
 class Gredentials:
 # The file token.pickle stores the user's access and refresh tokens, and is

@@ -18,6 +18,7 @@
 #TODO:  Clean up 'on_message' method ->  move sensor handling somewhere
 
 """-------- Version history ----------------------------------------------------
+    v1.5    yasperzee   6'19    mqtt_params is now dict
     v1.4    yasperzee   5'19    Separate mqtt_hanlder to separate module
     v1.3    yasperzee   5'19    Cleaning for Release
     v1.2    yasperzee   5'19    ALS support (TEMT6000)
@@ -83,15 +84,18 @@ def main():
     creds = istoken.creds
     del istoken
 
-#mqtt_params = (MQTT_HOST, MQTT_PORT, MQTT_KEEPALIVE, MQTT_CLIENT_ID)
-    mqtt_client = mqtt.Client(mqtt_params[3])
+    mqtt_client = mqtt.Client(mqtt_params['mqtt_clien_id'])
     mqtt_client.loop_start()
     mqtt_client.on_connect = on_connect
     #mqtt_client.on_message = on_message
     mqtt_client.on_message = on_message_old
 
     try:
-        mqtt_client.connect(mqtt_params[0], mqtt_params[1], mqtt_params[2])
+        mqtt_client.connect(mqtt_params['mqtt_host'],
+                            mqtt_params['mqtt_port'],
+                            mqtt_params['mqtt_keepalive']
+                            )
+
     except:
         print("ERROR: Cannot connect to mqtt server " + MQTT_HOST)
         quit()
