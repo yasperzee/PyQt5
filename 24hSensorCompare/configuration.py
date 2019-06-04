@@ -1,5 +1,11 @@
 #!/usr/bin/ python3
 
+# ********************* configuratrion.py **************************************
+#
+#   Description:        configuraions for mqtt to google sheet gateway
+#
+#   Install with pip3:  paho-mqtt, google-api-python-client, google-auth-oauthlib
+
 """------------------------------ Version history ------------------------------
 
     v1.5    yasperzee   6'19    mqtt_params is now dict

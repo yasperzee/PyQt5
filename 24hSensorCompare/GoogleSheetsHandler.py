@@ -1,5 +1,10 @@
 #!/usr/bin/ python3
 
+# ***************** GoogleSheetsHandlergle.py **********************************
+#
+#   Description:    Writes data from node to the google sheet
+#
+#*******************************************************************************
 """---------------------------- Version history --------------------------------
     v1.4    yasperzee   5'19    Cleaning for Release
     v1.3    yasperzee   5'19    ALS support (TEMT6000)
@@ -21,7 +26,7 @@
     v0.1    yasperzee   4'19    Classes moved to separate modules
                 Classes to write sensor data to sheet for weather_esp01_dht_http.py
 
-#TODD: Prepare project stucture for Docker
+#TODD:
 -----------------------------------------------------------------------------"""
 import os.path
 import pickle

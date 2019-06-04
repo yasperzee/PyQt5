@@ -1,0 +1,6 @@
+# requirements.txt
+
+paho-mqtt
+#pip install --upgrade google-api-python-client
+google-api-python-client
+google-auth-oauthlib

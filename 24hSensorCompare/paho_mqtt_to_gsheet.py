@@ -1,21 +1,20 @@
 #!/usr/bin/ python
-# ********************* python3 paho_mqtt_client.py ****************************
+
+# ***************** python3 paho_mqtt_client.py ********************************
 #
 #   Description:    Subscribe selected sensors to mqtt run_local_server
 #                   and send values to Google sheet.
 #
-#   Sensors:    BMP-180 / BMP-280 (temperature, pressure)
-#               BME-280 (temperature, pressure, humidity)
-#               DTH-11 / DTH22 (temperature,humidity)
-
-#   paho-mqtt:
-#   To obtain the full code, including examples and tests,
-#   you can clone the git repository:
-#        git clone https://github.com/eclipse/paho.mqtt.python
+#   Sensors:        BMP-180 / BMP-280 (temperature, pressure)
+#                   BME-280 (temperature, pressure, humidity)
+#                   DTH-11 / DTH22 (temperature,humidity)
+#                   TEMT6000 (AmbientLight)
+#
+#   paho-mqtt:      Install paho-mqtt for python3 with pip3
+#   To obtain the full code, including examples and tests, you can clone the git repository:
+#                   git clone https://github.com/eclipse/paho.mqtt.python
+#
 #*******************************************************************************
-#TODO:  Add failsafe incase server not available
-#TODO:  Get rid of globals
-#TODO:  Clean up 'on_message' method ->  move sensor handling somewhere
 
 """-------- Version history ----------------------------------------------------
     v1.5    yasperzee   6'19    mqtt_params is now dict
@@ -38,8 +37,13 @@
     v0.2    yasperzee   3'19    Subscribe "Koti/#"
     v0.1    yasperzee   3'19    Eclipse paho-mqtt client testing
 
-#TODO: Prepare project stucture for Docker
-""""""--------------------------------------------------------------------------"""
+#TODO:  Add failsafe incase server not available
+#TODO:  Get rid of globals
+#TODO:  Clean up 'on_message' method ->  move sensor handling somewhere
+#TODO:
+
+""""""-----------------------------------------------------------------------"""
+
 from __future__ import print_function
 import time
 
@@ -72,6 +76,8 @@ def on_message_old(client, userdata, msg):
 
 #*******************************************************************************
 def main():
+
+    print("HELLO FROM DOCKER!")
 
     # If token.pickle does not exists, create newone.
     istoken = Gredentials()

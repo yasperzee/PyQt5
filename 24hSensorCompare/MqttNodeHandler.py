@@ -1,22 +1,20 @@
 #!/usr/bin/ python
-# ********************* MqttNodeHandler.py ****************************
+
+# ***************** MqttNodeHandler.py *****************************************
 #
 #   Description:    Subscribe selected sensors to mqtt run_local_server
 #                   and send values to Google sheet.
 #
-#   Sensors:    BMP-180 / BMP-280 (temperature, pressure)
-#               BME-280 (temperature, pressure, humidity)
-#               DTH-11 / DTH22 (temperature,humidity)
-#               TEMT6000 (AmbientLight)
+#   Sensors:        BMP-180 / BMP-280 (temperature, pressure)
+#                   BME-280 (temperature, pressure, humidity)
+#                   DTH-11 / DTH22 (temperature,humidity)
+#                   TEMT6000 (AmbientLight)
 
-#   paho-mqtt:
-#   To obtain the full code, including examples and tests,
-#   you can clone the git repository:
-#        git clone https://github.com/eclipse/paho.mqtt.python
+#   paho-mqtt:      Install paho-mqtt for python3 with pip3
+#   To obtain the full code, including examples and tests, you can clone the git repository:
+#                   git clone https://github.com/eclipse/paho.mqtt.python
+#
 #*******************************************************************************
-#TODO:  Add failsafe incase server not available
-#TODO:  Get rid of globals
-#TODO:  Clean up 'on_message' method ->  move sensor handling somewhere
 
 """-------- Version history ----------------------------------------------------
     v1.4    yasperzee   5'19    Separate mqtt_hanlder to separate module
@@ -38,7 +36,11 @@
     v0.2    yasperzee   3'19    Subscribe "Koti/#"
     v0.1    yasperzee   3'19    Eclipse paho-mqtt client testing
 
-#TODD: Prepare project stucture for Docker
+#TODO: Add failsafe incase server not available
+#TODO: Get rid of globals
+#TODO: Clean up 'on_message' method ->  move sensor handling somewhere
+#TODD:
+
 """"""-----------------------------------------------------------------------"""
 from __future__ import print_function
 import time
@@ -49,6 +51,7 @@ from configuration import subscription
 #class DataToSheet(WriteNodeDataToSheet):
 #    pass
 #updateSheet = DataToSheet()
+
 updateSheet = WriteNodeDataToSheet()
 
 #*******************************************************************************
