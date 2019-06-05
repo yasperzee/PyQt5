@@ -2,22 +2,19 @@
 
 # ***************** MqttNodeHandler.py *****************************************
 #
-#   Description:    Subscribe selected sensors to mqtt run_local_server
-#                   and send values to Google sheet.
+#   Description:    main:   Subscribe selected sensors to mqtt mqtt_server
+#                           Read topics  
+#                           Send values to Google sheet.
 #
 #   Sensors:        BMP-180 / BMP-280 (temperature, pressure)
 #                   BME-280 (temperature, pressure, humidity)
 #                   DTH-11 / DTH22 (temperature,humidity)
 #                   TEMT6000 (AmbientLight)
-
-#   paho-mqtt:      Install paho-mqtt for python3 with pip3
-#   To obtain the full code, including examples and tests, you can clone the git repository:
-#                   git clone https://github.com/eclipse/paho.mqtt.python
 #
 #*******************************************************************************
 
 """-------- Version history ----------------------------------------------------
-    v1.4    yasperzee   5'19    Separate mqtt_hanlder to separate module
+    v1.4    yasperzee   5'19    Move mqtt_handler to separate module
     v1.3    yasperzee   5'19    Cleaning for Release
     v1.2    yasperzee   5'19    ALS support (TEMT6000)
     v1.1    yasperzee   5'19    vcc_batt
@@ -40,8 +37,7 @@
 #TODO: Get rid of globals
 #TODO: Clean up 'on_message' method ->  move sensor handling somewhere
 #TODD:
-
-""""""-----------------------------------------------------------------------"""
+-----------------------------------------------------------------------------"""
 from __future__ import print_function
 import time
 
@@ -56,6 +52,9 @@ updateSheet = WriteNodeDataToSheet()
 
 #*******************************************************************************
 class ReadMqttData:
+""" Read sensor data from mqtt server, inteprets topics and set values
+    to be send to the google sheet
+"""
     def __init__(self):
         self.topic      = "Empty"
         self.payload    = "Empty"

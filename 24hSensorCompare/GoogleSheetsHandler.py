@@ -4,6 +4,9 @@
 #
 #   Description:    Writes data from node to the google sheet
 #
+#   Dependencies:   Install google-api-python-client for python3 with pip3
+#                   Install google-auth-oauthlib for python3 with pip3
+#
 #*******************************************************************************
 """---------------------------- Version history --------------------------------
     v1.4    yasperzee   5'19    Cleaning for Release
@@ -32,9 +35,7 @@ import os.path
 import pickle
 import datetime
 
-# Install Googleapiclient for python3 with pip3
 from googleapiclient.discovery import build
-# Install google-auth-oauthlib for python3 with pip3
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from configuration import *
@@ -71,7 +72,7 @@ class WriteNodeDataToSheet:
         if service == 0:
             print('build FAIL!')
             # TODO: throw exception
-        #try
+            
         spreadsheet = service.spreadsheets() # Returns the spreadsheets Resource.
         if spreadsheet == 0:
             print('service FAIL!')

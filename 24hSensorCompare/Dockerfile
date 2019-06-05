@@ -9,6 +9,7 @@
 FROM python:3.7-alpine # --> image size is 101MB
 
 COPY ./requirements.txt /requirements.txt
+
 WORKDIR /
 
 RUN pip3 install -r requirements.txt

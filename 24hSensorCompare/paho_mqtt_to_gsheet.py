@@ -10,15 +10,16 @@
 #                   DTH-11 / DTH22 (temperature,humidity)
 #                   TEMT6000 (AmbientLight)
 #
-#   paho-mqtt:      Install paho-mqtt for python3 with pip3
-#   To obtain the full code, including examples and tests, you can clone the git repository:
-#                   git clone https://github.com/eclipse/paho.mqtt.python
+#   Dependencies:   Install paho-mqtt for python3 with pip3
+#                   To obtain the full code, including examples and tests,
+#                   you can clone the git repository:
+#                       git clone https://github.com/eclipse/paho.mqtt.python
 #
 #*******************************************************************************
 
-"""-------- Version history ----------------------------------------------------
+"""------- Version history -----------------------------------------------------
     v1.5    yasperzee   6'19    mqtt_params is now dict
-    v1.4    yasperzee   5'19    Separate mqtt_hanlder to separate module
+    v1.4    yasperzee   5'19    Move mqtt_handler to separate module
     v1.3    yasperzee   5'19    Cleaning for Release
     v1.2    yasperzee   5'19    ALS support (TEMT6000)
     v1.1    yasperzee   5'19    vcc_batt
@@ -41,13 +42,11 @@
 #TODO:  Get rid of globals
 #TODO:  Clean up 'on_message' method ->  move sensor handling somewhere
 #TODO:
-
-""""""-----------------------------------------------------------------------"""
+-----------------------------------------------------------------------------"""
 
 from __future__ import print_function
 import time
 
-# Install paho-mqtt for python3 with pip3
 import paho.mqtt.client as mqtt
 from GoogleSheetsHandler import Gredentials
 from GoogleSheetsHandler import WriteNodeDataToSheet
@@ -124,6 +123,10 @@ def main():
                 updateSheet.setSemaf(False)
                 """
     # def main()
+
+
+#if __name__ == "__main__":
+#    main()
 
 main()
 mqtt_data_handler

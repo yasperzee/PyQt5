@@ -4,10 +4,10 @@
 #
 #   Description:        configuraions for mqtt to google sheet gateway
 #
-#   Install with pip3:  paho-mqtt, google-api-python-client, google-auth-oauthlib
+#   Dependencies:       Install with pip3:  paho-mqtt, google-api-python-client, google-auth-oauthlib
 
-"""------------------------------ Version history ------------------------------
-
+"""-------- Version history ----------------------------------------------------
+    v1.6    yasperzee   6'19    Prepare project stucture for Docker
     v1.5    yasperzee   6'19    mqtt_params is now dict
     v1.4    yasperzee   5'19    Cleaning for Release
     v1.3    yasperzee   5'19    ALS support (TEMT6000)
@@ -27,7 +27,7 @@
     v0.1    yasperzee   4'19    Configurations for weather_esp01_dht_http.py
                                 Classes moved to separate modules
 
-#TODD: Prepare project stucture for Docker
+#TODD:
 -----------------------------------------------------------------------------"""
 
 """ Select some Topics to subscribe or add your ownones
