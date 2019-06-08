@@ -3,7 +3,7 @@
 # ***************** MqttNodeHandler.py *****************************************
 #
 #   Description:    main:   Subscribe selected sensors to mqtt mqtt_server
-#                           Read topics  
+#                           Read topics
 #                           Send values to Google sheet.
 #
 #   Sensors:        BMP-180 / BMP-280 (temperature, pressure)
@@ -34,7 +34,6 @@
     v0.1    yasperzee   3'19    Eclipse paho-mqtt client testing
 
 #TODO: Add failsafe incase server not available
-#TODO: Get rid of globals
 #TODO: Clean up 'on_message' method ->  move sensor handling somewhere
 #TODD:
 -----------------------------------------------------------------------------"""
@@ -52,9 +51,10 @@ updateSheet = WriteNodeDataToSheet()
 
 #*******************************************************************************
 class ReadMqttData:
-""" Read sensor data from mqtt server, inteprets topics and set values
+    """
+    Read sensor data from mqtt server, inteprets topics and set values
     to be send to the google sheet
-"""
+    """
     def __init__(self):
         self.topic      = "Empty"
         self.payload    = "Empty"
@@ -71,6 +71,7 @@ class ReadMqttData:
         #print("set_data, topic is  :" + topic )
         #print("set_data, payload is:" + payload )
 
+        #TODO: use dict to check if suppported feature ???
         nodefeat = "Lampotila"
         if topic.endswith(nodefeat):
             #print("nodefeat: " + nodefeat)
@@ -200,6 +201,5 @@ def on_message(client, userdata, msg):
     mqtt_data_handler.setPayload(str(msg.payload))
     #print("on_message, topic is  :" + mqtt_data_handler.getTopic())
     #print("on_message, payload is:" + mqtt_data_handler.getPayload())
-
     mqtt_data_handler.set_data()
     mqtt_data_handler.setSemaf(True)

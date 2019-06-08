@@ -2,11 +2,12 @@
 
 # ********************* configuratrion.py **************************************
 #
-#   Description:        configuraions for mqtt to google sheet gateway
+#   Description:        Configuraions for mqtt to google-sheet gateway
 #
 #   Dependencies:       Install with pip3:  paho-mqtt, google-api-python-client, google-auth-oauthlib
 
 """-------- Version history ----------------------------------------------------
+    v1.7    yasperzee   6'19    mqtt host address secured
     v1.6    yasperzee   6'19    Prepare project stucture for Docker
     v1.5    yasperzee   6'19    mqtt_params is now dict
     v1.4    yasperzee   5'19    Cleaning for Release
@@ -27,7 +28,7 @@
     v0.1    yasperzee   4'19    Configurations for weather_esp01_dht_http.py
                                 Classes moved to separate modules
 
-#TODD:
+#TODO:
 -----------------------------------------------------------------------------"""
 
 """ Select some Topics to subscribe or add your ownones
@@ -80,12 +81,12 @@ else:
         "Koti/Keittio/Lampotila",
         "Koti/Keittio/Ilmanpaine",
         "Koti/Keittio/Korkeus",
-        "Koti/Parveke/NodeInfo",        # NODE-04 / BMP280 & TEMT6000 (ESP12E)
-        "Koti/Parveke/TopicInfo",
-        "Koti/Parveke/Lampotila",
-        "Koti/Parveke/Ilmanpaine",
-        "Koti/Parveke/Korkeus",
-        "Koti/Parveke/Valoisuus",
+        "Koti/MH-3/NodeInfo",        # NODE-04 / BMP280 & TEMT6000 (ESP12E)
+        "Koti/MH-3/TopicInfo",
+        "Koti/MH-3/Lampotila",
+        "Koti/MH-3/Ilmanpaine",
+        "Koti/MH-3/Korkeus",
+        "Koti/MH-3/Valoisuus",
         "Koti/Partsi/NodeInfo",         # NODE-05 / BMP280 (ESP12E)
         "Koti/Partsi/TopicInfo",
         "Koti/Partsi/Lampotila",
@@ -98,12 +99,6 @@ else:
 SHEET_NAME = "CompareData"
 #SHEET_NAME = "SleepTest"
 #SHEET_NAME = "SensorData"
-
-# Select mqtt server connect to
-#MQTT_HOST = "192.168.10.50" # Phone, DEMO / RPI3, Wlan
-##MQTT_HOST = "192.168.10.52" # Local RPI3, LAN
-##MQTT_HOST = ("192.168.10.34" # Local W530
-MQTT_HOST = "192.168.10.63" # Local NP-510
 
 #MQTT_CLIENT_ID = "MqttClient_W530"
 #MQTT_CLIENT_ID = "MqttClient_RPI3"
@@ -151,23 +146,13 @@ SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 
 if SHEET_NAME == "CompareData":
     SHEET_ID = 0 # CompareData
-
 elif SHEET_NAME == "SleepTest":
     SHEET_ID = 1529352488 # SleepTest
-
 elif SHEET_NAME == "SensorData":
     SHEET_ID = 2099931552 #SensorData
-
-else:
-    print('Select SHEET!')
-    # TODO: throw exception
+#else:
+#    print('ERROR: No Sheet set!')
 
 ERROR_VALUE = -999,9
 START_ROW_INDEX = MIN_ROW-1
 END_ROW_INDEX = MAX_ROW
-
-mqtt_params = ({'mqtt_host':MQTT_HOST,
-                'mqtt_port':MQTT_PORT,
-                'mqtt_keepalive':MQTT_KEEPALIVE,
-                'mqtt_clien_id':MQTT_CLIENT_ID
-                })

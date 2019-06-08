@@ -39,7 +39,6 @@
     v0.1    yasperzee   3'19    Eclipse paho-mqtt client testing
 
 #TODO:  Add failsafe incase server not available
-#TODO:  Get rid of globals
 #TODO:  Clean up 'on_message' method ->  move sensor handling somewhere
 #TODO:
 -----------------------------------------------------------------------------"""
@@ -51,16 +50,17 @@ import paho.mqtt.client as mqtt
 from GoogleSheetsHandler import Gredentials
 from GoogleSheetsHandler import WriteNodeDataToSheet
 from MqttNodeHandler import updateSheet
-#from MqttNodeHandler import mqtt_data_handler
 from MqttNodeHandler import ReadMqttData
 from MqttNodeHandler import on_connect
 from MqttNodeHandler import on_message
-from configuration import mqtt_params
+
+from configuration import MQTT_PORT, MQTT_KEEPALIVE, MQTT_CLIENT_ID
+from mqtt_hosts import MQTT_HOST
 
 mqtt_data_handler = ReadMqttData()
 
 #*******************************************************************************
-# The callback for when a PUBLISH message is received from the mqtt-server.
+# The callback for when a PUBLISH message is received from thmqtt_paramse mqtt-server.
 def on_message_old(client, userdata, msg):
 
     mqtt_data_handler.setTopic(str(msg.topic))
@@ -75,40 +75,34 @@ def on_message_old(client, userdata, msg):
 
 #*******************************************************************************
 def main():
-
-    print("HELLO FROM DOCKER!")
-
-    # If token.pickle does not exists, create newone.
+    # If token.pickle does not exists, create newone, credentials.json must exist.
     istoken = Gredentials()
     try:
         istoken.getToken();
     except FileNotFoundError:
         print("ERROR: No such file or directory: credentials.json")
+        print("Please add credentials.json OR token.picle and run app again")
         quit()
-
     creds = istoken.creds
     del istoken
 
-    mqtt_client = mqtt.Client(mqtt_params['mqtt_clien_id'])
+    # Set mqtt clienet and callbacks
+    mqtt_client = mqtt.Client(MQTT_CLIENT_ID)
     mqtt_client.loop_start()
     mqtt_client.on_connect = on_connect
     #mqtt_client.on_message = on_message
     mqtt_client.on_message = on_message_old
 
     try:
-        mqtt_client.connect(mqtt_params['mqtt_host'],
-                            mqtt_params['mqtt_port'],
-                            mqtt_params['mqtt_keepalive']
-                            )
-
+        mqtt_client.connect(MQTT_HOST, MQTT_PORT, MQTT_KEEPALIVE)
     except:
         print("ERROR: Cannot connect to mqtt server " + MQTT_HOST)
+        #TODO: retry instead of quit
         quit()
 
     while True:
         if mqtt_data_handler.getSemaf():
-            #mqtt_client.disconnect
-            print("MAIN: Entering writeSensorDataToSheet")
+            #TODO: mqtt_client.disconnect ???
             updateSheet.writeSensorDataToSheet(creds);
             mqtt_data_handler.setSemaf(False)
 
@@ -117,6 +111,7 @@ def main():
             try:
                 updateSheet.writeSensorDataToSheet(creds);
             except:
+                #TODO: retry or skip instead of quit
                 print("ERROR: cannot write to sheet ")
                 quit()
             finally:
@@ -124,9 +119,5 @@ def main():
                 """
     # def main()
 
-
-#if __name__ == "__main__":
-#    main()
-
-main()
-mqtt_data_handler
+if __name__ == "__main__":
+    main()
