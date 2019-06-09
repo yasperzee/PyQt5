@@ -110,7 +110,7 @@ class WriteNodeDataToSheet:
             node_topic_range = node_topic_range3
             node_info_range  = node_info_range3
             START_COLUMN_INDEX = 10 #K
-            END_COLUMN_INDEX = 14   # date, time, temp, baro, (als to 1 row only)
+            END_COLUMN_INDEX = 13   # date, time, temp, ( baro, als to 1. row only)
         elif self.node_id == "NODE-04":
             value_range      = SHEET_NAME + value_range4
             node_topic_range = node_topic_range4

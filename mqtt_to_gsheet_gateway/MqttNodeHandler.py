@@ -14,6 +14,7 @@
 #*******************************************************************************
 
 """-------- Version history ----------------------------------------------------
+    v1.5    yasperzee   6'19    disconnet callback handling
     v1.4    yasperzee   5'19    Move mqtt_handler to separate module
     v1.3    yasperzee   5'19    Cleaning for Release
     v1.2    yasperzee   5'19    ALS support (TEMT6000)
@@ -187,12 +188,18 @@ class ReadMqttData:
 #*******************************************************************************
 # The callback for when the client receives a CONNACK response from the mqtt-server.
 def on_connect(client, userdata, flags, rc):
-    print("mqtt server connected.")
+    print("on_connect: mqtt server connected.")
     #print("mqtt_server connected with result code "+str(rc))
     # Subscribing in on_connect() means that if we lose the connection and
     # reconnect then subscriptions will be renewed.
     for subsc in subscription:
         client.subscribe(subsc)
+
+#*******************************************************************************
+# The callback for when the client receives a CONNACK response from the mqtt-server.
+def on_disconnect():
+    print("on_disconnect: mqtt server connection closed.")
+
 
 #*******************************************************************************
 # The callback for when a PUBLISH message is received from the mqtt-server.

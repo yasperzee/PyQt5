@@ -72,10 +72,10 @@ else:
         "Koti/Olohuone/TopicInfo",
         "Koti/Olohuone/Lampotila",
         "Koti/Olohuone/Ilmankosteus",
-        "Koti/Ulkoilma/NodeInfo",       # NODE-02 / DHT22 (ESP01)
-        "Koti/Ulkoilma/TopicInfo",
-        "Koti/Ulkoilma/Lampotila",
-        "Koti/Ulkoilma/Ilmankosteus",
+        "Koti/IceBox/NodeInfo",       # NODE-02 / DHT22 (ESP01)
+        "Koti/IceBox/TopicInfo",
+        "Koti/IceBox/Lampotila",
+        "Koti/IceBox/Ilmankosteus",
         "Koti/Keittio/NodeInfo",        # NODE-03 / BMP180 (ESP01)
         "Koti/Keittio/TopicInfo",
         "Koti/Keittio/Lampotila",
@@ -139,8 +139,9 @@ node_topic_range5 = '!Y3'
 MQTT_PORT = 1883
 #MQTT_PORT = 8883
 MQTT_KEEPALIVE = 60 # Seconds 0..120
-# The ID of a spreadsheet.
+MQTT_RECONN_DELAY = 30 # Seconds 0..120
 
+# The ID of a spreadsheet.
 SPREADSHEET_ID = '1bZ0gfiIlpTnHn-vMSA-m9OzVQEtF1l7ELNo40k0EBcM'
 # If modifying these scopes, delete the file token.pickle.
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']

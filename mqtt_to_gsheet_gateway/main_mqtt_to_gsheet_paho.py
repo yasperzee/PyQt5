@@ -18,6 +18,7 @@
 #*******************************************************************************
 
 """------- Version history -----------------------------------------------------
+    v1.6    yasperzee   6'19    disconnet callback handling, reconnect if mqtt_server not available
     v1.5    yasperzee   6'19    mqtt_params is now dict
     v1.4    yasperzee   5'19    Move mqtt_handler to separate module
     v1.3    yasperzee   5'19    Cleaning for Release
@@ -52,9 +53,10 @@ from GoogleSheetsHandler import WriteNodeDataToSheet
 from MqttNodeHandler import updateSheet
 from MqttNodeHandler import ReadMqttData
 from MqttNodeHandler import on_connect
+from MqttNodeHandler import on_disconnect
 from MqttNodeHandler import on_message
 
-from configuration import MQTT_PORT, MQTT_KEEPALIVE, MQTT_CLIENT_ID
+from configuration import MQTT_PORT, MQTT_KEEPALIVE, MQTT_CLIENT_ID, MQTT_RECONN_DELAY
 from mqtt_hosts import MQTT_HOST
 
 mqtt_data_handler = ReadMqttData()
@@ -86,19 +88,41 @@ def main():
     creds = istoken.creds
     del istoken
 
-    # Set mqtt clienet and callbacks
+    # Set mqtt client and callbacks
     mqtt_client = mqtt.Client(MQTT_CLIENT_ID)
     mqtt_client.loop_start()
     mqtt_client.on_connect = on_connect
+    mqtt_client.on_disconnect = on_disconnect
+
     #mqtt_client.on_message = on_message
     mqtt_client.on_message = on_message_old
 
+    # reconnect_delay_set(min_delay=1, max_delay=120)
+    connected = False
     try:
-        mqtt_client.connect(MQTT_HOST, MQTT_PORT, MQTT_KEEPALIVE)
-    except:
-        print("ERROR: Cannot connect to mqtt server " + MQTT_HOST)
-        #TODO: retry instead of quit
-        quit()
+        mqtt_client.connect(MQTT_HOST, MQTT_PORT, MQTT_KEEPALIVE);
+    except IOError as e:
+        connected = False
+        if e.errno == 101:
+            print ("Network Error")
+            time.sleep(1)
+    else:
+        print("Mqtt server connected " + MQTT_HOST)
+        connected = True
+    finally:
+        if not connected:
+            print("Mqtt server reconnecting: " + MQTT_HOST)
+            mqtt_client.reconnect_delay_set(MQTT_RECONN_DELAY)
+            try:
+                mqtt_client.reconnect();
+            except IOError as e:
+                connected = False
+                if e.errno == 101:
+                    print ("Network Error")
+                    time.sleep(1)
+            else:
+                print("Mqtt server connected " + MQTT_HOST)
+
 
     while True:
         if mqtt_data_handler.getSemaf():

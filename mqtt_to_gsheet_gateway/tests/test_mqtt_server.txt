@@ -1,0 +1,7 @@
+# test mqtt server connection fails
+
+1) Disconnect Wlan
+    --> app should reconnect when Wlan availble again
+
+2) Disconnect mqtt server
+    --> app should reconnect when server brought back online
