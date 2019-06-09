@@ -39,7 +39,6 @@
     v0.2    yasperzee   3'19    Subscribe "Koti/#"
     v0.1    yasperzee   3'19    Eclipse paho-mqtt client testing
 
-#TODO:  Add failsafe incase server not available
 #TODO:  Clean up 'on_message' method ->  move sensor handling somewhere
 #TODO:
 -----------------------------------------------------------------------------"""
@@ -105,7 +104,7 @@ def main():
         connected = False
         if e.errno == 101:
             print ("Network Error")
-            time.sleep(1)
+            #time.sleep(1)
     else:
         print("Mqtt server connected " + MQTT_HOST)
         connected = True
@@ -119,7 +118,7 @@ def main():
                 connected = False
                 if e.errno == 101:
                     print ("Network Error")
-                    time.sleep(1)
+                    #time.sleep(1)
             else:
                 print("Mqtt server connected " + MQTT_HOST)
 

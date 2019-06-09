@@ -9,6 +9,8 @@
 #
 #*******************************************************************************
 """---------------------------- Version history --------------------------------
+    v1.4    yasperzee   6'19    Exception handling added here and there to avoid
+                                app crash on runtime if access to spreadsheet not available
     v1.4    yasperzee   5'19    Cleaning for Release
     v1.3    yasperzee   5'19    ALS support (TEMT6000)
     v1.2.2  yasperzee   5'19    Sheet header updated
@@ -67,16 +69,17 @@ class WriteNodeDataToSheet:
         # Supported APIs w/ versions: https://developers.google.com/api-client-library/python/apis/
         # https://developers.google.com/sheets/api/
         # Build the service object
-        #try
-        service = build('sheets', 'v4', credentials=self.creds)
-        if service == 0:
+        try:
+            service = build('sheets', 'v4', credentials=self.creds);
+        except:
             print('build FAIL!')
-            # TODO: throw exception / return error value
+            return
 
-        spreadsheet = service.spreadsheets() # Returns the spreadsheets Resource.
-        if spreadsheet == 0:
+        try:
+            spreadsheet = service.spreadsheets(); # Returns the spreadsheets Resource.
+        except:
             print('service FAIL!')
-            # TODO: throw exception / return error value
+            return
 
         # Set and print date & time
         d_format = "%d-%b-%Y"
@@ -157,7 +160,12 @@ class WriteNodeDataToSheet:
                     range = SHEET_NAME + node_topic_range,
                     valueInputOption='USER_ENTERED',
                     body = {'values': [bodyValues]})
-        request.execute() # TODO: add failsafe / return error value
+        try:
+            request.execute()
+        except:
+            print('Write location to the sheet FAIL!')
+            return
+
         print("Location   : " + self.location)
         self.location = "Unknown LOCATION!"
 
@@ -172,7 +180,12 @@ class WriteNodeDataToSheet:
                     range = SHEET_NAME + node_info_range,
                     valueInputOption = 'USER_ENTERED',
                     body = {'values': [bodyValues]})
-        request.execute() # TODO: add failsafe / return error value
+        try:
+            request.execute()
+        except:
+            print('Write nodeInfo to the sheet FAIL!')
+            return
+
         print("NodeID     : " + self.node_id)
         print("NodeMcu    : " + self.nodemcu)
         print("Sensor     : " + self.sensor)
@@ -198,7 +211,11 @@ class WriteNodeDataToSheet:
                 request = service.spreadsheets().batchUpdate(
                 spreadsheetId = SPREADSHEET_ID,
                 body = {'requests': [batch_update_spreadsheet_request_body]})
-                response = request.execute() # TODO: add failsafe / return error value
+                try:
+                    response = request.execute()
+                except:
+                    print('copy and paste data area FAIL!')
+                    return
 
                 bodyValues = [ self.date, self.time, self.temp, self.humid ] #temp and humid
                 if (self.humid == ERROR_VALUE): # Update temperature only to sheet
@@ -210,7 +227,11 @@ class WriteNodeDataToSheet:
                              range = value_range,
                              valueInputOption = 'USER_ENTERED',
                              body = {'values': [bodyValues]})
-                result.execute() # TODO: add failsafe / return error value
+                try:
+                    result.execute()
+                except:
+                    print('Update date, time and values to MIN_ROW FAIL!')
+                    return
                 print("Temperature:{:>7}".format(self.temp))
                 self.temp = "N/A"
 
@@ -219,7 +240,11 @@ class WriteNodeDataToSheet:
                 request =   service.spreadsheets().values().clear(
                             spreadsheetId = SPREADSHEET_ID,
                             range = (SHEET_NAME + '!A'+ str(MAX_ROW+1) + ':' + 'O' + str(MAX_ROW+1)))
-                request.execute() # TODO: add failsafe / return error value
+                try:
+                    request.execute()
+                except:
+                    print('Clear row MAX_ROW+1 FAIL!')
+                    return
                 print("Temperature:{:>7}".format(self.temp))
                 if (self.humid == ERROR_VALUE):
                     print("Humidity   : ", self.humid)
@@ -236,8 +261,11 @@ class WriteNodeDataToSheet:
                 request = service.spreadsheets().batchUpdate(
                 spreadsheetId = SPREADSHEET_ID,
                 body = {'requests': [batch_update_spreadsheet_request_body]})
-                response = request.execute() # TODO: add failsafe / return error value
-
+                try:
+                    response = request.execute()
+                except:
+                    print('copy and paste data area one row downFAIL!')
+                    return
                 #if self.sensor == "BME280":or self.sensor == "Bor self.sensor == "BMP280+ALS"MP280+ALS"
                     #  bodyValues = [ self.date, self.time, self.temp, self.baro, self.humid, self.vcc, self.als] ##BME280
                 #else:
@@ -250,7 +278,11 @@ class WriteNodeDataToSheet:
                             range = value_range,
                             valueInputOption = 'USER_ENTERED',
                             body = {'values': [bodyValues]})
-                result.execute() # TODO: add failsafe / return error value
+                try:
+                    result.execute()
+                except:
+                    print('Update date, time and values to MIN_ROW FAIL!')
+                    return
 
                 if (self.temp == "N/A"):
                     print("Temperature: ", self.temp)
@@ -283,7 +315,11 @@ class WriteNodeDataToSheet:
                 request =   service.spreadsheets().values().clear(
                             spreadsheetId=SPREADSHEET_ID,
                             range = (SHEET_NAME + '!A'+ str(MAX_ROW+1) + ':' + 'O' + str(MAX_ROW+1)))
-                request.execute() # TODO: add failsafe / return error value
+                try:
+                    request.execute()
+                except:
+                    print('Clear row MAX_ROW+1 FAIL!')
+                    return
 
 # Getters & Setters
     def getUnsubscribe(self):

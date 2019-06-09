@@ -7,6 +7,8 @@
 #   Dependencies:       Install with pip3:  paho-mqtt, google-api-python-client, google-auth-oauthlib
 
 """-------- Version history ----------------------------------------------------
+
+    v1.8    yasperzee   6'19    Exception handling added for SHEET_NAME and MQTT_CLIENT_ID
     v1.7    yasperzee   6'19    mqtt host address secured
     v1.6    yasperzee   6'19    Prepare project stucture for Docker
     v1.5    yasperzee   6'19    mqtt_params is now dict
@@ -99,12 +101,13 @@ else:
 SHEET_NAME = "CompareData"
 #SHEET_NAME = "SleepTest"
 #SHEET_NAME = "SensorData"
+#SHEET_NAME = "UNSUPPORTED"
 
-#MQTT_CLIENT_ID = "MqttClient_W530"
+MQTT_CLIENT_ID = "MqttClient_W530"
 #MQTT_CLIENT_ID = "MqttClient_RPI3"
 #MQTT_CLIENT_ID = "MqttClient_N510"
 #MQTT_CLIENT_ID = "SleepTest_"
-MQTT_CLIENT_ID = "Docker 01"
+#MQTT_CLIENT_ID = "Docker 01"
 
 ## First row to write data ( Header is 4 rows )
 MIN_ROW = 5
@@ -143,17 +146,31 @@ MQTT_RECONN_DELAY = 30 # Seconds 0..120
 
 # The ID of a spreadsheet.
 SPREADSHEET_ID = '1bZ0gfiIlpTnHn-vMSA-m9OzVQEtF1l7ELNo40k0EBcM'
+#SPREADSHEET_ID = '1bZ0gfiIlpTnHn-vMSA-m9OzVQEtF1l7ELNo40k0EBcMERRpr'
+
 # If modifying these scopes, delete the file token.pickle.
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 
+try:
+    SHEET_NAME
+except NameError:
+    SHEET_NAME = "ERROR"
 if SHEET_NAME == "CompareData":
     SHEET_ID = 0 # CompareData
 elif SHEET_NAME == "SleepTest":
     SHEET_ID = 1529352488 # SleepTest
 elif SHEET_NAME == "SensorData":
     SHEET_ID = 2099931552 #SensorData
-#else:
-#    print('ERROR: No Sheet set!')
+else:
+    print('ERROR: unsupported SHEET_NAME or SHEET_NAME not defined')
+    quit()
+
+try:
+    MQTT_CLIENT_ID
+except NameError:
+    print('ERROR: MQTT_CLIENT_ID not defined')
+    quit()
+
 
 ERROR_VALUE = -999,9
 START_ROW_INDEX = MIN_ROW-1
