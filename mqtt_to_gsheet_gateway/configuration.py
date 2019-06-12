@@ -8,6 +8,8 @@
 
 """-------- Version history ----------------------------------------------------
 
+    v1.9    yasperzee   6'19    No error count to sheet, sheet header re-arranged,
+                                Format datetime together --> Release v1.0 -> combability brake to older versions!!!
     v1.8    yasperzee   6'19    Exception handling added for SHEET_NAME and MQTT_CLIENT_ID
     v1.7    yasperzee   6'19    mqtt host address secured
     v1.6    yasperzee   6'19    Prepare project stucture for Docker
@@ -50,7 +52,6 @@
 """
 
 #SUBS = "SLEEP_TESTING"
-#SUBS = "TESTING"
 SUBS = "SUBSALL"
 
 if SUBS == "SLEEP_TESTING":
@@ -62,40 +63,35 @@ if SUBS == "SLEEP_TESTING":
         "Koti/Testing/Korkeus",
         "Koti/Testing/Vcc"
         )
-elif SUBS == "TESTING":
-    subscription = (
-        "Koti/Parveke/NodeInfo",        # NODE-04 / BMP280 & TEMT6000 (ESP12E)
-        "Koti/Parveke/TopicInfo",
-        "Koti/Parveke/Lampotila"
-        )
 else:
     subscription = (
-        "Koti/Olohuone/NodeInfo",       # NODE-01 / DHT11 (ESP01)
-        "Koti/Olohuone/TopicInfo",
-        "Koti/Olohuone/Lampotila",
-        "Koti/Olohuone/Ilmankosteus",
-        "Koti/IceBox/NodeInfo",       # NODE-02 / DHT22 (ESP01)
-        "Koti/IceBox/TopicInfo",
-        "Koti/IceBox/Lampotila",
-        "Koti/IceBox/Ilmankosteus",
-        "Koti/Keittio/NodeInfo",        # NODE-03 / BMP180 (ESP01)
-        "Koti/Keittio/TopicInfo",
-        "Koti/Keittio/Lampotila",
-        "Koti/Keittio/Ilmanpaine",
-        "Koti/Keittio/Korkeus",
-        "Koti/MH-3/NodeInfo",        # NODE-04 / BMP280 & TEMT6000 (ESP12E)
-        "Koti/MH-3/TopicInfo",
-        "Koti/MH-3/Lampotila",
-        "Koti/MH-3/Ilmanpaine",
-        "Koti/MH-3/Korkeus",
-        "Koti/MH-3/Valoisuus",
-        "Koti/Partsi/NodeInfo",         # NODE-05 / BMP280 (ESP12E)
+        "Koti/MH-1/NodeInfo",       # NODE-01 / DHT22 (ESP01)
+        "Koti/MH-1/TopicInfo",
+        "Koti/MH-1/Lampotila",
+        "Koti/MH-1/Ilmankosteus",
+        "Koti/Partsi/NodeInfo",     # NODE-02 / BMP180 (ESP01)
         "Koti/Partsi/TopicInfo",
         "Koti/Partsi/Lampotila",
         "Koti/Partsi/Ilmanpaine",
         "Koti/Partsi/Korkeus",
-        "Koti/Partsi/Vcc"
         )
+
+    """
+        "Koti/Olohuone/NodeInfo",       # NODE- / DHT11 (ESP01)
+        "Koti/Olohuone/TopicInfo",
+        "Koti/Olohuone/Lampotila",
+        "Koti/Olohuone/Ilmankosteus",
+        "Koti/MH-1/NodeInfo",       # NODE- /
+        "Koti/MH-1/TopicInfo",
+        "Koti/MH-1/Lampotila",
+        "Koti/MH-1/Ilmankosteus",
+        "Koti/Keittio/NodeInfo",        # NODE- / BMP280 & TEMT6000 (ESP12E)
+        "Koti/Keittio/TopicInfo",
+        "Koti/Keittio/Lampotila",
+        "Koti/Keittio/Ilmanpaine",
+        "Koti/Keittio/Korkeus",
+        )
+    """
 
 # Sheet named 'SHEET_NAME' must exist on Spreadsheet
 SHEET_NAME = "CompareData"
@@ -103,17 +99,18 @@ SHEET_NAME = "CompareData"
 #SHEET_NAME = "SensorData"
 #SHEET_NAME = "UNSUPPORTED"
 
-MQTT_CLIENT_ID = "MqttClient_W530"
+#MQTT_CLIENT_ID = "MqttClient_W530"
 #MQTT_CLIENT_ID = "MqttClient_RPI3"
 #MQTT_CLIENT_ID = "MqttClient_N510"
 #MQTT_CLIENT_ID = "SleepTest_"
-#MQTT_CLIENT_ID = "Docker 01"
+MQTT_CLIENT_ID = "Docker 01"
 
 ## First row to write data ( Header is 4 rows )
 MIN_ROW = 5
 # Make sure there is at least MAX_ROW+1 rows in sheet!
-#MAX_ROW = 96 + MIN_ROW # 15min update interval => 96 records / day(24h)
-MAX_ROW = 288 + MIN_ROW # 15min update interval => 288 records / 72h
+#MAX_ROW = 96 + MIN_ROW # 15min update interval => 96 records / 24h
+MAX_ROW = 288 + MIN_ROW # 5min update interval => 288 records / 24h
+
 #MAX_ROW = 672 + MIN_ROW # 15min update interval => 672 records / week(7days)
 #MAX_ROW = 2688 + MIN_ROW # 15min update interval => 2688 records / month(4wk)
 #MAX_ROW = 32256 + MIN_ROW # 15min update interval => 32256 records / year(12months)
@@ -123,9 +120,9 @@ MAX_ROW = 288 + MIN_ROW # 15min update interval => 288 records / 72h
 value_range1      = '!A'+ str(MIN_ROW)
 node_info_range1  = '!A2'
 node_topic_range1 = '!A3'
-value_range2      = '!F'+ str(MIN_ROW)
-node_info_range2  = '!F2'
-node_topic_range2 = '!F3'
+value_range2      = '!E'+ str(MIN_ROW)
+node_info_range2  = '!E2'
+node_topic_range2 = '!E3'
 value_range3      = '!K'+ str(MIN_ROW)
 node_info_range3  = '!K2'
 node_topic_range3 = '!K3'

@@ -39,7 +39,6 @@
     v0.2    yasperzee   3'19    Subscribe "Koti/#"
     v0.1    yasperzee   3'19    Eclipse paho-mqtt client testing
 
-#TODO:  Clean up 'on_message' method ->  move sensor handling somewhere
 #TODO:
 -----------------------------------------------------------------------------"""
 

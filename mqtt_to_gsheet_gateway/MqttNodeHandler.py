@@ -115,7 +115,7 @@ class ReadMqttData:
             tmp = tmp.strip('}\'')
             tmp = tmp.replace(".", ",")
             updateSheet.setHumid(tmp)
-            #print("Humidity is:" + updateSheet.getHumid())
+            print("Humidity is:" + updateSheet.getHumid())
 
         nodefeat = "Valoisuus"
         if topic.endswith(nodefeat):

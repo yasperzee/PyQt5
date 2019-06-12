@@ -9,6 +9,10 @@
 #
 #*******************************************************************************
 """---------------------------- Version history --------------------------------
+
+    v1.9    yasperzee   6'19    No error count to sheet, sheet header re-arranged,
+                                Format datetime together --> Release v1.0 -> combability brake to older versions!!!
+
     v1.4    yasperzee   6'19    Exception handling added here and there to avoid
                                 app crash on runtime if access to spreadsheet not available
     v1.4    yasperzee   5'19    Cleaning for Release
@@ -36,6 +40,7 @@
 import os.path
 import pickle
 import datetime
+import time
 
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -44,6 +49,7 @@ from configuration import *
 
 class WriteNodeDataToSheet:
     def __init__(self):
+        self.datetime   = "Empty!"
         self.date       = "Empty!"
         self.time       = "Empty!"
         self.temp       = "N/A"
@@ -81,13 +87,9 @@ class WriteNodeDataToSheet:
             print('service FAIL!')
             return
 
-        # Set and print date & time
-        d_format = "%d-%b-%Y"
-        t_format = "%H:%M"
-        now = datetime.datetime.today()
-        self.date = now.strftime(d_format)
-        self.time = now.strftime(t_format)
-        print("\n" + self.date + " " + self.time )
+        dt = datetime.datetime.combine(datetime.date.today(), datetime.time(1, 2, 3))
+        self.datetime = str(dt)
+        print("\n" + self.datetime)
 
         # check if node_id received from node is valid
         if self.node_id == "NODE-00": # Sleep Test
@@ -101,13 +103,13 @@ class WriteNodeDataToSheet:
             node_topic_range = node_topic_range1
             node_info_range  = node_info_range1
             START_COLUMN_INDEX = 0  #A
-            END_COLUMN_INDEX = 4    # date, time, temp, humid
+            END_COLUMN_INDEX = 3    # datetime, temp, humid
         elif self.node_id == "NODE-02":
             value_range      = SHEET_NAME + value_range2
             node_topic_range = node_topic_range2
             node_info_range  = node_info_range2
-            START_COLUMN_INDEX = 5  #F
-            END_COLUMN_INDEX = 9    # date, time, temp, humid
+            START_COLUMN_INDEX = 4  #F
+            END_COLUMN_INDEX = 7    # datetime, temp, humid
         elif self.node_id == "NODE-03":
             value_range      = SHEET_NAME + value_range3
             node_topic_range = node_topic_range3
@@ -128,7 +130,7 @@ class WriteNodeDataToSheet:
             END_COLUMN_INDEX = 29   # date, time, temp, baro, als
         else:
             print('Unsupported NODE-id!')
-            # TODO: throw exception and skip
+            return
 
         batch_update_spreadsheet_request_body = [
             {
@@ -171,9 +173,9 @@ class WriteNodeDataToSheet:
 
         # Write nodeInfo to the sheet.
         if (self.sensor == "DHT11" or self.sensor == "DHT22"):
-            bodyValues = [ self.node_id, self.nodemcu, self.sensor, self.failCount ] #DHT sensors
+            bodyValues = [ self.node_id, self.nodemcu, self.sensor] #DHT sensors
         else:
-            bodyValues = [ self.node_id, self.nodemcu, self.sensor, self.failCount, self.alti, self.vcc ] #BMP sensors
+            bodyValues = [ self.node_id, self.nodemcu, self.sensor, self.alti] #BMP sensors
 
         request =   service.spreadsheets().values().update(
                     spreadsheetId = SPREADSHEET_ID,
@@ -192,20 +194,17 @@ class WriteNodeDataToSheet:
         print("Altitude   : " + self.alti)
         print("Error count: " + self.failCount)
         print("Vcc        : " + self.vcc)
-        #self.node_id    = "Unknown NODE!"
-        #self.nodemcu    = "Unknown MCU!"
-        #self.sensor     = "Unknown SENSOR!"
-        #self.alti       = "N/A"
+        self.node_id    = "Unknown NODE!"
+        self.nodemcu    = "Unknown MCU!"
+        self.sensor     = "Unknown SENSOR!"
+        self.alti       = "N/A"
         #self.failCount  = "?"
-        #self.vcc       = "N/A"
-
-        if (self.sensor == "DHT22"):
-            self.humid = ERROR_VALUE
+        self.vcc       = "N/A"
 
         if (self.sensor == "DHT11" or self.sensor == "DHT22"):
             if ( self.temp == ERROR_VALUE):
                 print("ERROR VALUE: Sensor = ", self.sensor)
-                print("")
+                print("Humidity   :{:>7}".format(self.humid))
             else:
                 # 1) copy and paste data area one row down
                 request = service.spreadsheets().batchUpdate(
@@ -217,11 +216,20 @@ class WriteNodeDataToSheet:
                     print('copy and paste data area FAIL!')
                     return
 
-                bodyValues = [ self.date, self.time, self.temp, self.humid ] #temp and humid
-                if (self.humid == ERROR_VALUE): # Update temperature only to sheet
-                    bodyValues = [ self.date, self.time, self.temp ] #temp only
-
                 # 2) Update date, time and values to MIN_ROW
+
+                #   bodyValues = [self.date, self.time, self.temp, self.humid ] #temp and humid
+                bodyValues = [ self.datetime, self.temp, self.humid ] #temp and humid
+                print("Temperature:{:>7}".format(self.temp))
+                if (self.humid == ERROR_VALUE):
+                    print("Humidity ERROR! ",self.humid)
+                    bodyValues = [ self.datetime, self.temp ] #temp only
+                    #bodyValues = [ self.datetime, self.temp ] #temp only
+                else:
+                    print("Humidity   :{:>7}".format(self.humid))
+                self.temp  = "N/A"
+                self.humid = "N/A"
+
                 result =    service.spreadsheets().values().update(
                              spreadsheetId = SPREADSHEET_ID,
                              range = value_range,
@@ -232,8 +240,8 @@ class WriteNodeDataToSheet:
                 except:
                     print('Update date, time and values to MIN_ROW FAIL!')
                     return
-                print("Temperature:{:>7}".format(self.temp))
                 self.temp = "N/A"
+                self.humid = "N/A"
 
                 # 3) Clear row MAX_ROW+1
                 #TODO: Do we need this at all?
@@ -245,13 +253,6 @@ class WriteNodeDataToSheet:
                 except:
                     print('Clear row MAX_ROW+1 FAIL!')
                     return
-                print("Temperature:{:>7}".format(self.temp))
-                if (self.humid == ERROR_VALUE):
-                    print("Humidity   : ", self.humid)
-                else:
-                    print("Humidity   :{:>7}".format(self.humid))
-                self.temp  = "N/A"
-                self.humid = "N/A"
 
         elif (self.sensor == "BMP180" or self.sensor == "BMP180+ALS" or self.sensor == "BMP280" or self.sensor == "BMP280+ALS" or self.sensor == "BME280" or self.sensor == "BME280+ALS"):
             if ( self.temp == ERROR_VALUE or self.humid == ERROR_VALUE or self.baro == ERROR_VALUE ):
@@ -270,7 +271,7 @@ class WriteNodeDataToSheet:
                     #  bodyValues = [ self.date, self.time, self.temp, self.baro, self.humid, self.vcc, self.als] ##BME280
                 #else:
                 #bodyValues = [ self.date, self.time, self.temp, self.baro, self.vcc, self.als] ##BMP180 & BMP280
-                bodyValues = [ self.date, self.time, self.temp, self.baro, self.als] ##BMP180 & BMP280
+                bodyValues = [ self.datetime, self.temp, self.baro] ##BMP180 & BMP280
 
                 # 2) Update date, time and values to MIN_ROW
                 result =    service.spreadsheets().values().update(
