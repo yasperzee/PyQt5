@@ -70,7 +70,7 @@ class ReadMqttData:
 
         #print("On set_data")
         #print("set_data, topic is  :" + topic )
-        #print("set_data, payload is:" + payload )
+        #print("set_data, payload is:" + payload + "\n" )
 
         #TODO: use dict to check if suppported feature ???
         nodefeat = "Lampotila"
@@ -115,7 +115,7 @@ class ReadMqttData:
             tmp = tmp.strip('}\'')
             tmp = tmp.replace(".", ",")
             updateSheet.setHumid(tmp)
-            print("Humidity is:" + updateSheet.getHumid())
+            #print("Humidity is:" + updateSheet.getHumid())
 
         nodefeat = "Valoisuus"
         if topic.endswith(nodefeat):
@@ -188,7 +188,7 @@ class ReadMqttData:
 #*******************************************************************************
 # The callback for when the client receives a CONNACK response from the mqtt-server.
 def on_connect(client, userdata, flags, rc):
-    print("on_connect: mqtt server connected.")
+    #print("on_connect: mqtt server connected.")
     #print("mqtt_server connected with result code "+str(rc))
     # Subscribing in on_connect() means that if we lose the connection and
     # reconnect then subscriptions will be renewed.

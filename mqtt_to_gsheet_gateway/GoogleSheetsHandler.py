@@ -39,9 +39,9 @@
 -----------------------------------------------------------------------------"""
 import os.path
 import pickle
-import datetime
+#import datetime
 import time
-
+from datetime import datetime
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
@@ -50,8 +50,6 @@ from configuration import *
 class WriteNodeDataToSheet:
     def __init__(self):
         self.datetime   = "Empty!"
-        self.date       = "Empty!"
-        self.time       = "Empty!"
         self.temp       = "N/A"
         self.humid      = "N/A"
         self.baro       = "N/A"
@@ -87,7 +85,9 @@ class WriteNodeDataToSheet:
             print('service FAIL!')
             return
 
-        dt = datetime.datetime.combine(datetime.date.today(), datetime.time(1, 2, 3))
+        # current date and time
+        now = datetime.now()
+        dt = now.strftime("%d/%m/%Y, %H:%M")
         self.datetime = str(dt)
         print("\n" + self.datetime)
 
@@ -191,20 +191,20 @@ class WriteNodeDataToSheet:
         print("NodeID     : " + self.node_id)
         print("NodeMcu    : " + self.nodemcu)
         print("Sensor     : " + self.sensor)
-        print("Altitude   : " + self.alti)
+        #print("Altitude   : " + self.alti)
         print("Error count: " + self.failCount)
-        print("Vcc        : " + self.vcc)
-        self.node_id    = "Unknown NODE!"
-        self.nodemcu    = "Unknown MCU!"
-        self.sensor     = "Unknown SENSOR!"
-        self.alti       = "N/A"
+        #print("Vcc        : " + self.vcc)
+        #self.node_id    = "Unknown NODE!"
+        #self.nodemcu    = "Unknown MCU!"
+        #self.sensor     = "Unknown SENSOR!"
+        #self.alti       = "N/A"
         #self.failCount  = "?"
-        self.vcc       = "N/A"
+        #self.vcc       = "N/A"
 
         if (self.sensor == "DHT11" or self.sensor == "DHT22"):
             if ( self.temp == ERROR_VALUE):
                 print("ERROR VALUE: Sensor = ", self.sensor)
-                print("Humidity   :{:>7}".format(self.humid))
+                #print("Humidity   :{:>7}".format(self.humid))
             else:
                 # 1) copy and paste data area one row down
                 request = service.spreadsheets().batchUpdate(
@@ -216,25 +216,20 @@ class WriteNodeDataToSheet:
                     print('copy and paste data area FAIL!')
                     return
 
-                # 2) Update date, time and values to MIN_ROW
-
-                #   bodyValues = [self.date, self.time, self.temp, self.humid ] #temp and humid
+                # 2) Update datetime and values to MIN_ROW
                 bodyValues = [ self.datetime, self.temp, self.humid ] #temp and humid
-                print("Temperature:{:>7}".format(self.temp))
+                print("Temperature: {:>7}".format(self.temp))
                 if (self.humid == ERROR_VALUE):
                     print("Humidity ERROR! ",self.humid)
                     bodyValues = [ self.datetime, self.temp ] #temp only
-                    #bodyValues = [ self.datetime, self.temp ] #temp only
                 else:
                     print("Humidity   :{:>7}".format(self.humid))
-                self.temp  = "N/A"
-                self.humid = "N/A"
 
                 result =    service.spreadsheets().values().update(
-                             spreadsheetId = SPREADSHEET_ID,
-                             range = value_range,
-                             valueInputOption = 'USER_ENTERED',
-                             body = {'values': [bodyValues]})
+                            spreadsheetId = SPREADSHEET_ID,
+                            range = value_range,
+                            valueInputOption = 'USER_ENTERED',
+                            body = {'values': [bodyValues]})
                 try:
                     result.execute()
                 except:
@@ -267,13 +262,9 @@ class WriteNodeDataToSheet:
                 except:
                     print('copy and paste data area one row downFAIL!')
                     return
-                #if self.sensor == "BME280":or self.sensor == "Bor self.sensor == "BMP280+ALS"MP280+ALS"
-                    #  bodyValues = [ self.date, self.time, self.temp, self.baro, self.humid, self.vcc, self.als] ##BME280
-                #else:
-                #bodyValues = [ self.date, self.time, self.temp, self.baro, self.vcc, self.als] ##BMP180 & BMP280
-                bodyValues = [ self.datetime, self.temp, self.baro] ##BMP180 & BMP280
 
                 # 2) Update date, time and values to MIN_ROW
+                bodyValues = [ self.datetime, self.temp, self.baro] ##BMP180 & BMP280
                 result =    service.spreadsheets().values().update(
                             spreadsheetId = SPREADSHEET_ID,
                             range = value_range,
@@ -286,30 +277,35 @@ class WriteNodeDataToSheet:
                     return
 
                 if (self.temp == "N/A"):
-                    print("Temperature: ", self.temp)
+                    pass
+                    #print("Temperature: ", self.temp)
                 else:
-                    print("Temperature:{:>7}".format(self.temp))
+                    print("Temperature: {:>7}".format(self.temp))
                 if (self.baro == "N/A"):
-                    print("Barometer  : ", self.baro)
+                    pass
+                    #print("Barometer  : ", self.baro)
                 else:
                     print("Barometer  :{:>7}".format(self.baro))
                 if (self.alti == "N/A"):
-                    print("Altitude   : ", self.alti)
+                    pass
+                    #print("Altitude   : ", self.alti)
                 else:
                     print("Altitude   :{:>7}".format(self.alti))
                 if (self.humid == "N/A"):
-                    print("Humidity   : ", self.humid)
+                    pass
+                    #print("Humidity   : ", self.humid)
                 else:
                     print("Humidity   :{:>7}".format(self.humid))
                 if (self.als == "N/A"):
-                    print("Lightness  : ", self.als)
+                    pass
+                    #print("Lightness  : ", self.als)
                 else:
                     print("Lightness  :{:>7}".format(self.als))
+                self.humid = "N/A"
                 self.temp = "N/A"
                 self.baro = "N/A"
                 self.alti = "N/A"
-                self.humid = "N/A"
-                self.als  = "N/A"
+                self.als = "N/A"
 
                 # 3) Clear row MAX_ROW+1
                 #TODO: Do we need this at all ?
@@ -323,21 +319,6 @@ class WriteNodeDataToSheet:
                     return
 
 # Getters & Setters
-    def getUnsubscribe(self):
-        return self.unsubscribe
-    def setUnsubscribe(self, unsubscribe):
-        self.unsubscribe = unsubscribe
-
-    def getTime(self):
-        return self.time
-    def setTime(self, time):
-        self.time = time
-
-    def getDate(self):
-        return self.date
-    def setDate(self, date):
-        self.date = date
-
     def getTemp(self):
         return self.temp
     def setTemp(self, temp):
