@@ -74,24 +74,13 @@ else:
         "Koti/Partsi/Lampotila",
         "Koti/Partsi/Ilmanpaine",
         "Koti/Partsi/Korkeus",
-        )
-
-    """
-        "Koti/Olohuone/NodeInfo",       # NODE- / DHT11 (ESP01)
+        "Koti/Olohuone/NodeInfo",   # NODE-04 / BMP280 & TEMT6000 (ESP12E)
         "Koti/Olohuone/TopicInfo",
         "Koti/Olohuone/Lampotila",
-        "Koti/Olohuone/Ilmankosteus",
-        "Koti/MH-1/NodeInfo",       # NODE- /
-        "Koti/MH-1/TopicInfo",
-        "Koti/MH-1/Lampotila",
-        "Koti/MH-1/Ilmankosteus",
-        "Koti/Keittio/NodeInfo",        # NODE- / BMP280 & TEMT6000 (ESP12E)
-        "Koti/Keittio/TopicInfo",
-        "Koti/Keittio/Lampotila",
-        "Koti/Keittio/Ilmanpaine",
-        "Koti/Keittio/Korkeus",
+        "Koti/Olohuone/Ilmanpaine",
+        "Koti/Olohuone/Korkeus",
+        "Koti/Olohuone/Valoisuus"
         )
-    """
 
 # Sheet named 'SHEET_NAME' must exist on Spreadsheet
 SHEET_NAME = "CompareData"
@@ -100,10 +89,10 @@ SHEET_NAME = "CompareData"
 #SHEET_NAME = "UNSUPPORTED"
 
 #MQTT_CLIENT_ID = "MqttClient_W530"
-#MQTT_CLIENT_ID = "MqttClient_RPI3"
+MQTT_CLIENT_ID = "MqttClient_RPI3"
 #MQTT_CLIENT_ID = "MqttClient_N510"
 #MQTT_CLIENT_ID = "SleepTest_"
-MQTT_CLIENT_ID = "Docker 01"
+#MQTT_CLIENT_ID = "Docker 01"
 
 ## First row to write data ( Header is 4 rows )
 MIN_ROW = 5
@@ -123,12 +112,12 @@ node_topic_range1 = '!A3'
 value_range2      = '!E'+ str(MIN_ROW)
 node_info_range2  = '!E2'
 node_topic_range2 = '!E3'
-value_range3      = '!K'+ str(MIN_ROW)
-node_info_range3  = '!K2'
-node_topic_range3 = '!K3'
-value_range4      = '!R'+ str(MIN_ROW)
-node_info_range4  = '!R2'
-node_topic_range4 = '!R3'
+value_range3      = '!J'+ str(MIN_ROW)
+node_info_range3  = '!J2'
+node_topic_range3 = '!J3'
+value_range4      = '!O'+ str(MIN_ROW)
+node_info_range4  = '!O2'
+node_topic_range4 = '!O3'
 value_range5      = '!Y'+ str(MIN_ROW)
 node_info_range5  = '!Y2'
 node_topic_range5 = '!Y3'

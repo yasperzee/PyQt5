@@ -114,8 +114,8 @@ class WriteNodeDataToSheet:
             value_range      = SHEET_NAME + value_range3
             node_topic_range = node_topic_range3
             node_info_range  = node_info_range3
-            START_COLUMN_INDEX = 10 #K
-            END_COLUMN_INDEX = 13   # date, time, temp, ( baro, als to 1. row only)
+            START_COLUMN_INDEX = 9 #J
+            END_COLUMN_INDEX = 13   # date, time, temp, (baro, als to 1. row only)
         elif self.node_id == "NODE-04":
             value_range      = SHEET_NAME + value_range4
             node_topic_range = node_topic_range4
@@ -260,11 +260,13 @@ class WriteNodeDataToSheet:
                 try:
                     response = request.execute()
                 except:
-                    print('copy and paste data area one row downFAIL!')
+                    print('copy and paste data area one row down FAIL!')
                     return
 
                 # 2) Update date, time and values to MIN_ROW
-                bodyValues = [ self.datetime, self.temp, self.baro] ##BMP180 & BMP280
+                bodyValues = [ self.datetime, self.temp, self.baro] #BMP180 & BMP280
+                if (self.sensor == "BMP180+ALS" or self.sensor == "BMP280+ALS"):
+                    bodyValues = [ self.datetime, self.temp, self.baro, self.alti]
                 result =    service.spreadsheets().values().update(
                             spreadsheetId = SPREADSHEET_ID,
                             range = value_range,
